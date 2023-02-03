@@ -1,0 +1,9 @@
+li#accordion-section-title_tagline > h3.accordion-section-title:before {
+    content: "\f319";
+    font-family: dashicons;
+    padding: 3px;
+    }
+
+    body {
+        color: rgb(16, 62, 213);
+    }

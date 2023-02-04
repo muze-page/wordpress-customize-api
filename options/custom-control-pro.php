@@ -872,8 +872,266 @@ array(
 ) );
 
 
+//文本单选按钮控件
+
+	/**
+	 * Radio Button and Select sanitization
+	 *
+	 * @param  string		Radio Button value
+	 * @return integer	Sanitized value
+	 */
+	if ( ! function_exists( 'skyrocket_radio_sanitization_c' ) ) {
+		function skyrocket_radio_sanitization_c( $input, $setting ) {
+			//get the list of possible radio box or select options
+		 $choices = $setting->manager->get_control( $setting->id )->choices;
+
+			if ( array_key_exists( $input, $choices ) ) {
+				return $input;
+			} else {
+				return $setting->default;
+			}
+		}
+	}
 
 
+   	/**
+	 * Text Radio Button Custom Control
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+	 class Skyrocket_Text_Radio_Button_Custom_Control_e extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'text_radio_button_e';
+		/**
+		 * Enqueue our scripts and styles
+		 */
+		public function enqueue() {
+			//wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+		}
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content() {
+		?>
+			<div class="text_radio_button_control">
+				<?php if( !empty( $this->label ) ) { ?>
+					<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+				<?php } ?>
+				<?php if( !empty( $this->description ) ) { ?>
+					<span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
+				<?php } ?>
+
+				<div class="radio-buttons">
+					<?php foreach ( $this->choices as $key => $value ) { ?>
+						<label class="radio-button-label">
+							<input type="radio" name="<?php echo esc_attr( $this->id ); ?>" value="<?php echo esc_attr( $key ); ?>" <?php $this->link(); ?> <?php checked( esc_attr( $key ), $this->value() ); ?>/>
+							<span><?php echo esc_attr( $value ); ?></span>
+						</label>
+					<?php	} ?>
+				</div>
+			</div>
+         <style>
+/* ==========================================================================
+   Text Radio Buttons
+   ========================================================================== */
+   .text_radio_button_control:after {
+	content: " ";
+	display: block;
+	clear: both;
+}
+
+.text_radio_button_control .radio-buttons {
+	display: inline-block;
+	border: 1px solid #f9f9fe;
+}
+
+.text_radio_button_control .radio-button-label {
+	cursor: pointer;
+	float: left;
+}
+
+.text_radio_button_control .radio-button-label > input {
+	display: none;
+}
+
+.text_radio_button_control .radio-button-label span {
+	cursor: pointer;
+	font-weight: 500;
+	border: 2px solid #f9f9fe;
+	margin: 0;
+	background-color: #eee;
+	padding: 5px 15px;
+	display: inline-block;
+}
+
+.text_radio_button_control .radio-button-label span:hover {
+	background-color: rgba(255, 255, 255, .2);
+	color: #2885bb;
+}
+
+.text_radio_button_control .radio-button-label > input:checked + span {
+	background-color: #2084bd;
+	color: #fff;
+}
+
+.text_radio_button_control .radio-button-label > input:checked + span:hover {
+	color: #fff;
+}
+            </style>
+		<?php
+		}
+	}
+
+
+		//文本单选按钮自定义控件测试
+		$wp_customize->add_setting( 'sample_text_radio_button_e',
+			array(
+				'default' =>'right',
+				'transport' => 'refresh',
+				'sanitize_callback' => 'skyrocket_radio_sanitization_c'
+			)
+		);
+		$wp_customize->add_control( new Skyrocket_Text_Radio_Button_Custom_Control_e( $wp_customize, 'sample_text_radio_button_e',
+			array(
+				'label' => __( '文本单选按钮控件', 'skyrocket' ),
+				'description' => esc_html__( '自定义控件说明示例', 'skyrocket' ),
+				'section' => 'section_pro',
+				'choices' => array(
+					'left' => __( 'Left', 'skyrocket' ),
+					'centered' => __( 'Centered', 'skyrocket' ),
+					'right' => __( 'Right', 'skyrocket'  )
+				)
+			)
+		) );
+
+
+      /**
+	 * 图像复选框自定义控件
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+    class Skyrocket_Image_Checkbox_Custom_Control_d extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'image_checkbox_dssd';
+		/**
+		 * Enqueue our scripts and styles
+		 */
+		public function enqueue() {
+			//wp_enqueue_style( 'skyrocket-custom-controls-css', plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+            //wp_enqueue_script( 'skyrocket-custom-controls-js', plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
+		}
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content() {
+		?>
+			<div class="image_checkbox_control">
+				<?php if( !empty( $this->label ) ) { ?>
+					<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+				<?php } ?>
+				<?php if( !empty( $this->description ) ) { ?>
+					<span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
+				<?php } ?>
+				<?php	$chkboxValues = explode( ',', esc_attr( $this->value() ) ); ?>
+				<input type="hidden" id="<?php echo esc_attr( $this->id ); ?>" name="<?php echo esc_attr( $this->id ); ?>" value="<?php echo esc_attr( $this->value() ); ?>" class="customize-control-multi-image-checkbox" <?php $this->link(); ?> />
+				<?php foreach ( $this->choices as $key => $value ) { ?>
+					<label class="checkbox-label">
+						<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $key ); ?>" <?php checked( in_array( esc_attr( $key ), $chkboxValues ), 1 ); ?> class="multi-image-checkbox"/>
+						<img src="<?php echo esc_attr( $value['image'] ); ?>" alt="<?php echo esc_attr( $value['name'] ); ?>" title="<?php echo esc_attr( $value['name'] ); ?>" />
+					</label>
+				<?php	} ?>
+			</div>
+            <style>
+
+/* ==========================================================================
+   Image Checkboxes
+   ========================================================================== */
+.image_checkbox_control .checkbox-label > input {
+	display: none;
+}
+
+.image_checkbox_control .checkbox-label > img {
+	cursor: pointer;
+	border: 3px solid #ddd;
+}
+
+.image_checkbox_control .checkbox-label > input:checked + img {
+	border: 3px solid #2885bb;
+}
+                </style>
+            <script>
+                jQuery( document ).ready(function($) {
+	"use strict";
+                	/**
+	 * Image Checkbox Custom Control
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+
+	$('.multi-image-checkbox').on('change', function () {
+	  skyrocketGetAllImageCheckboxes($(this).parent().parent());
+	});
+
+	// Get the values from the checkboxes and add to our hidden field
+	function skyrocketGetAllImageCheckboxes($element) {
+	  var inputValues = $element.find('.multi-image-checkbox').map(function() {
+	    if( $(this).is(':checked') ) {
+	      return $(this).val();
+	    }
+	  }).toArray();
+	  // Important! Make sure to trigger change event so Customizer knows it has to save the field
+	  $element.find('.customize-control-multi-image-checkbox').val(inputValues).trigger('change');
+	}
+
+});
+                </script>
+		<?php
+		}
+	}
+
+    		// Test of Image Checkbox Custom Control
+		$wp_customize->add_setting( 'sample_image_checkbox_d',
+        array(
+            'default' => 'stylebold,styleallcaps',
+            'transport' => 'refresh',
+            //'sanitize_callback' => 'skyrocket_text_sanitization_d'
+        )
+    );
+    $wp_customize->add_control( new Skyrocket_Image_checkbox_Custom_Control_d( $wp_customize, 'sample_image_checkbox_d',
+        array(
+            'label' => __( '图像复选框控件', 'skyrocket' ),
+            'description' => esc_html__( '自定义控件说明示例', 'skyrocket' ),
+            'section' => 'section_pro',
+            'choices' => array(
+                'stylebold' => array(
+                    'image' => plugin_dir_url( __DIR__ ) . 'public/images/Bold.png',
+                    'name' => __( 'Bold', 'skyrocket' )
+                ),
+                'styleitalic' => array(
+                    'image' => plugin_dir_url( __DIR__ ) . 'public/images/Italic.png',
+                    'name' => __( 'Italic', 'skyrocket' )
+                ),
+                'styleallcaps' => array(
+                    'image' => plugin_dir_url( __DIR__ ) . 'public/images/AllCaps.png',
+                    'name' => __( 'All Caps', 'skyrocket' )
+                ),
+                'styleunderline' => array(
+                    'image' => plugin_dir_url( __DIR__ ) . 'public/images/Underline.png',
+                    'name' => __( 'Underline', 'skyrocket' )
+                )
+            )
+        )
+    ) );
 
    /**
     * WP_Customize_Control

@@ -6,18 +6,10 @@ function api_separator( $wp_customize ) {
 
     $wp_customize->add_section( 'separator_section',
     array(
-        'title' => __( '基础控件 - 自定义' ),
+        'title' => __( '基础自定义控件' ),
         'description' => esc_html__( '以下是自定义控件的示例。' ),
     )
 );
-
-//基础类
-
-
-
-
-
-
 
 
 //最新帖子下拉菜单（列出最新十篇文章控件）
@@ -70,154 +62,6 @@ $wp_customize->add_control( new WP_Customize_Latest_Post_Control(
 
 
 
-//多图片选择控件
-	/**
-	 * 文本净化
-	 *
-	 * @param  string	要清理的输入（包含单个字符串或多个字符串，用逗号分隔）
-	 * @return string	消毒输入
-	 */
-	if ( ! function_exists( 'skyrocket_text_sanitization_d' ) ) {
-		function skyrocket_text_sanitization_d( $input ) {
-			if ( strpos( $input, ',' ) !== false) {
-				$input = explode( ',', $input );
-			}
-			if( is_array( $input ) ) {
-				foreach ( $input as $key => $value ) {
-					$input[$key] = sanitize_text_field( $value );
-				}
-				$input = implode( ',', $input );
-			}
-			else {
-				$input = sanitize_text_field( $input );
-			}
-			return $input;
-		}
-	}
-
-	/**
-	 * 图像复选框自定义控件
-	 *
-	 * @author Anthony Hortin <http://maddisondesigns.com>
-	 * @license http://www.gnu.org/licenses/gpl-2.0.html
-	 * @link https://github.com/maddisondesigns
-	 */
-    class Skyrocket_Image_Checkbox_Custom_Control_d extends WP_Customize_Control {
-		/**
-		 * The type of control being rendered
-		 */
-		public $type = 'image_checkbox_dssd';
-		/**
-		 * Enqueue our scripts and styles
-		 */
-		public function enqueue() {
-			//wp_enqueue_style( 'skyrocket-custom-controls-css', plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
-            //wp_enqueue_script( 'skyrocket-custom-controls-js', plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
-		}
-		/**
-		 * Render the control in the customizer
-		 */
-		public function render_content() {
-		?>
-			<div class="image_checkbox_control">
-				<?php if( !empty( $this->label ) ) { ?>
-					<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
-				<?php } ?>
-				<?php if( !empty( $this->description ) ) { ?>
-					<span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
-				<?php } ?>
-				<?php	$chkboxValues = explode( ',', esc_attr( $this->value() ) ); ?>
-				<input type="hidden" id="<?php echo esc_attr( $this->id ); ?>" name="<?php echo esc_attr( $this->id ); ?>" value="<?php echo esc_attr( $this->value() ); ?>" class="customize-control-multi-image-checkbox" <?php $this->link(); ?> />
-				<?php foreach ( $this->choices as $key => $value ) { ?>
-					<label class="checkbox-label">
-						<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $key ); ?>" <?php checked( in_array( esc_attr( $key ), $chkboxValues ), 1 ); ?> class="multi-image-checkbox"/>
-						<img src="<?php echo esc_attr( $value['image'] ); ?>" alt="<?php echo esc_attr( $value['name'] ); ?>" title="<?php echo esc_attr( $value['name'] ); ?>" />
-					</label>
-				<?php	} ?>
-			</div>
-            <style>
-
-/* ==========================================================================
-   Image Checkboxes
-   ========================================================================== */
-.image_checkbox_control .checkbox-label > input {
-	display: none;
-}
-
-.image_checkbox_control .checkbox-label > img {
-	cursor: pointer;
-	border: 3px solid #ddd;
-}
-
-.image_checkbox_control .checkbox-label > input:checked + img {
-	border: 3px solid #2885bb;
-}
-                </style>
-            <script>
-                jQuery( document ).ready(function($) {
-	"use strict";
-                	/**
-	 * Image Checkbox Custom Control
-	 *
-	 * @author Anthony Hortin <http://maddisondesigns.com>
-	 * @license http://www.gnu.org/licenses/gpl-2.0.html
-	 * @link https://github.com/maddisondesigns
-	 */
-
-	$('.multi-image-checkbox').on('change', function () {
-	  skyrocketGetAllImageCheckboxes($(this).parent().parent());
-	});
-
-	// Get the values from the checkboxes and add to our hidden field
-	function skyrocketGetAllImageCheckboxes($element) {
-	  var inputValues = $element.find('.multi-image-checkbox').map(function() {
-	    if( $(this).is(':checked') ) {
-	      return $(this).val();
-	    }
-	  }).toArray();
-	  // Important! Make sure to trigger change event so Customizer knows it has to save the field
-	  $element.find('.customize-control-multi-image-checkbox').val(inputValues).trigger('change');
-	}
-
-});
-                </script>
-		<?php
-		}
-	}
-
-    		// Test of Image Checkbox Custom Control
-		$wp_customize->add_setting( 'sample_image_checkbox_d',
-        array(
-            'default' => 'stylebold,styleallcaps',
-            'transport' => 'refresh',
-            //'sanitize_callback' => 'skyrocket_text_sanitization_d'
-        )
-    );
-    $wp_customize->add_control( new Skyrocket_Image_checkbox_Custom_Control_d( $wp_customize, 'sample_image_checkbox_d',
-        array(
-            'label' => __( '图像复选框控件', 'skyrocket' ),
-            'description' => esc_html__( '自定义控件说明示例', 'skyrocket' ),
-            'section' => 'separator_section',
-            'choices' => array(
-                'stylebold' => array(
-                    'image' => plugin_dir_url( __DIR__ ) . 'public/images/Bold.png',
-                    'name' => __( 'Bold', 'skyrocket' )
-                ),
-                'styleitalic' => array(
-                    'image' => plugin_dir_url( __DIR__ ) . 'public/images/Italic.png',
-                    'name' => __( 'Italic', 'skyrocket' )
-                ),
-                'styleallcaps' => array(
-                    'image' => plugin_dir_url( __DIR__ ) . 'public/images/AllCaps.png',
-                    'name' => __( 'All Caps', 'skyrocket' )
-                ),
-                'styleunderline' => array(
-                    'image' => plugin_dir_url( __DIR__ ) . 'public/images/Underline.png',
-                    'name' => __( 'Underline', 'skyrocket' )
-                )
-            )
-        )
-    ) );
 
 
 

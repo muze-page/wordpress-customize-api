@@ -1366,6 +1366,97 @@ array(
 		) );
 
 
+      //简单通知自定义控件
+
+      	/**
+	 * 文本净化
+	 *
+	 * @param  string	要清理的输入（包含单个字符串或多个字符串，用逗号分隔）
+	 * @return string	Sanitized input
+	 */
+	if ( ! function_exists( 'skyrocket_text_sanitization_a' ) ) {
+		function skyrocket_text_sanitization_a( $input ) {
+			if ( strpos( $input, ',' ) !== false) {
+				$input = explode( ',', $input );
+			}
+			if( is_array( $input ) ) {
+				foreach ( $input as $key => $value ) {
+					$input[$key] = sanitize_text_field( $value );
+				}
+				$input = implode( ',', $input );
+			}
+			else {
+				$input = sanitize_text_field( $input );
+			}
+			return $input;
+		}
+	}
+
+   	/**
+	 * 简单的自定义通知控件
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+	class Skyrocket_Simple_Notice_Custom_Control_a extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'simple_notice_a';
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content() {
+			$allowed_html = array(
+				'a' => array(
+					'href' => array(),
+					'title' => array(),
+					'class' => array(),
+					'target' => array(),
+				),
+				'br' => array(),
+				'em' => array(),
+				'strong' => array(),
+				'i' => array(
+					'class' => array()
+				),
+				'span' => array(
+					'class' => array(),
+				),
+				'code' => array(),
+			);
+		?>
+			<div class="simple-notice-custom-control">
+				<?php if( !empty( $this->label ) ) { ?>
+					<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+				<?php } ?>
+				<?php if( !empty( $this->description ) ) { ?>
+					<span class="customize-control-description"><?php echo wp_kses( $this->description, $allowed_html ); ?></span>
+				<?php } ?>
+			</div>
+		<?php
+		}
+	}
+
+
+      		// Test of Simple Notice control
+		$wp_customize->add_setting( 'sample_simple_notice_a',
+      array(
+         'default' => '',
+         'transport' => 'postMessage',
+         'sanitize_callback' => 'skyrocket_text_sanitization_a'
+      )
+   );
+   $wp_customize->add_control( new Skyrocket_Simple_Notice_Custom_control_a( $wp_customize, 'sample_simple_notice_a',
+      array(
+         'label' => __( '一个简单有趣的通知', 'skyrocket' ),
+         'description' => __( '此自定义控件允许您向用户显示简单的标题和描述. You can even include <a href="http://google.com" target="_blank">basic html</a>.', 'skyrocket' ),
+         'section' => 'section_pro'
+      )
+   ) );
+
+
       //Alpha颜色选择器控件
 
       	/**

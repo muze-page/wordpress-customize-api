@@ -762,6 +762,119 @@ $wp_customize->add_section( 'section_pro',
    ) );
 
 
+   //布局选择控件
+    	/**
+	 * 单选按钮和选择消毒
+	 *
+	 * @param  string		Radio Button value
+	 * @return integer	Sanitized value
+	 */
+	if ( ! function_exists( 'skyrocket_radio_sanitization_a' ) ) {
+		function skyrocket_radio_sanitization_a( $input, $setting ) {
+			//获取可能的单选框列表或选择选项
+		 $choices = $setting->manager->get_control( $setting->id )->choices;
+
+			if ( array_key_exists( $input, $choices ) ) {
+				return $input;
+			} else {
+				return $setting->default;
+			}
+		}
+	}
+
+class Skyrocket_Image_Radio_Button_Custom_Control_b extends WP_Customize_Control {
+
+    
+    /**
+     * 正在呈现的控件类型
+     */
+    public $type = 'image_radio_button_a';
+    /**
+     * Enqueue our scripts and styles
+     */
+    public function enqueue() {
+        //加载控件所需样式
+       // wp_enqueue_style( 'skyrocket-custom-controls-css', plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+    }
+    /**
+     * 在自定义程序中渲染控件
+     */
+    public function render_content() {
+    ?>
+        <div class="image_radio_button_control">
+            <?php if( !empty( $this->label ) ) { ?>
+                <span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+            <?php } ?>
+            <?php if( !empty( $this->description ) ) { ?>
+                <span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
+            <?php } ?>
+
+            <?php foreach ( $this->choices as $key => $value ) { ?>
+                <label class="radio-button-label">
+                    <input type="radio" name="<?php echo esc_attr( $this->id ); ?>" value="<?php echo esc_attr( $key ); ?>" <?php $this->link(); ?> <?php checked( esc_attr( $key ), $this->value() ); ?>/>
+                    <img src="<?php echo esc_attr( $value['image'] ); ?>" alt="<?php echo esc_attr( $value['name'] ); ?>" title="<?php echo esc_attr( $value['name'] ); ?>" />
+                    
+                </label>
+            <?php	} ?>
+        </div>
+        <style>
+            /*控件所需样式*/
+            /* ==========================================================================
+   Image Radio Buttons
+   ========================================================================== */
+.image_radio_button_control .radio-button-label > input {
+	display: none;
+}
+
+.image_radio_button_control .radio-button-label > img {
+	cursor: pointer;
+	border: 3px solid #ddd;
+}
+
+.image_radio_button_control .radio-button-label > input:checked + img {
+	border: 3px solid #2885bb;
+}
+
+            </style>
+    <?php
+    }
+
+
+
+}
+
+$wp_customize->add_setting( 'sample_image_radio_button_a',
+array(
+    'transport' => 'refresh',
+    'sanitize_callback' => 'skyrocket_radio_sanitization_a'
+)
+);
+$wp_customize->add_control( new Skyrocket_Image_Radio_Button_Custom_Control_b( $wp_customize, 'sample_image_radio_button_a',
+array(
+    'label' => __( '图像单选按钮控件', 'skyrocket' ),
+    'description' => esc_html__( '自定义控件说明示例', 'skyrocket' ),
+    'section' => 'section_pro',
+    'choices' => array(
+        'sidebarleft' => array(
+            'image' => plugin_dir_url( __DIR__ ) . 'public/images/sidebar-left.png',
+            'name' => __( 'Left Sidebar', 'skyrocket' )
+        ),
+        'sidebarnone' => array(
+            'image' => plugin_dir_url( __DIR__ ) . 'public/images/sidebar-none.png',
+            'name' => __( 'No Sidebar', 'skyrocket' )
+        ),
+        'sidebarright' => array(
+            'image' => plugin_dir_url( __DIR__ ) . 'public/images/sidebar-right.png',
+            'name' => __( 'Right Sidebar', 'skyrocket' )
+        )
+    )
+)
+) );
+
+
+
+
+
    /**
     * WP_Customize_Control
 	*		wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );

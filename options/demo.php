@@ -41,5 +41,29 @@ $wp_customize->add_control( 'demo_default_text',
 
 }
 ;
-add_action( 'customize_register', 'api_customize_register' );
+//add_action( 'customize_register', 'api_customize_register' );
+
+
+//add_action( 'wp_head', 'test_demo_top' );
+
+function test_demo_top() {
+
+   $a =  plugin_dir_url( __FILE__ ) . 'public/css/customizer-css.css';
+   $b = demo_content();
+   //$add_content = '<h1>'.p( test ).'</h1>';
+   $add_content = '<h1>'.$b.'</h1>';
+   echo $add_content;
+}
+;
+
+//装载测试内容
+function demo_content(){
+   return '
+基本控件演示
+
+   ';
+}
+;
+
+
 ?>

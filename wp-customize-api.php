@@ -17,8 +17,8 @@ require_once dirname( __FILE__ ) . '/options/custom-control.php' ;
 //自定义控件 - 高级
 require_once dirname( __FILE__ ) . '/options/custom-control-pro.php' ;
 
-//最小化的控件
-//require_once dirname( __FILE__ ) . '/options/demo.php' ;
+//加载测试框架
+require_once dirname( __FILE__ ) . '/options/demo.php' ;
 //测试控件
 //require_once dirname( __FILE__ ) . '/test.php' ;
 

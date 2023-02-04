@@ -1157,7 +1157,7 @@ array(
     ) );
 
 
-    //手风琴控件
+    //单手风琴控件
     	/**
 	 * 文本净化
 	 *
@@ -1193,13 +1193,13 @@ array(
 		/**
 		 * The type of control being rendered
 		 */
-		public $type = 'single_accordion';
+		public $type = 'single_accordion_f';
 		/**
 		 * Enqueue our scripts and styles
 		 */
 		public function enqueue() {
-			wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
-			wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+			//wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
+			//wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
 		}
 		/**
 		 * Render the control in the customizer
@@ -1237,6 +1237,80 @@ array(
 				  ?>
 				</div>
 			</div>
+         <style>
+            /* ==========================================================================
+   单手风琴
+   ========================================================================== */
+.single-accordion-toggle {
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 24px;
+	padding: 10px 5px 5px 0;
+	cursor: pointer;
+}
+
+.accordion-icon-toggle {
+	font-size: 18px;
+	margin-left: 5px;
+	margin-top: 5px;
+	-webkit-transition: -webkit-transform 0.3s ease-in-out;
+	-moz-transition: -moz-transform 0.3s ease-in-out;
+	-o-transition: -o-transform 0.3s ease-in-out;
+	transition: transform 0.3s ease-in-out;
+}
+
+.single-accordion-toggle-rotate .accordion-icon-toggle {
+	filter: progid: DXImageTransform.Microsoft.BasicImage(rotation=-0.5);
+	-webkit-transform: rotate(-45deg);
+	-moz-transform: rotate(-45deg);
+	-ms-transform: rotate(-45deg);
+	-o-transform: rotate(-45deg);
+	transform: rotate(-45deg);
+	display: inline-block;
+}
+
+.single-accordion {
+	display: none;
+}
+
+.single-accordion ul {
+	margin: 0;
+	padding: 0;
+}
+
+.single-accordion li {
+	background-color: #e4e4e4;
+	color: #888;
+	width: 115px;
+	display: inline-block;
+	padding: 5px;
+	margin: 5px;
+	text-align: center;
+}
+
+.single-accordion li i {
+	margin-left: 5px;
+}
+            </style>
+            <script>
+               jQuery( document ).ready(function($) {
+	"use strict";
+               /**
+	 * 单手风琴自定义控件
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+
+	$('.single-accordion-toggle').click(function() {
+		var $accordionToggle = $(this);
+		$(this).parent().find('.single-accordion').slideToggle('slow', function() {
+			$accordionToggle.toggleClass('single-accordion-toggle-rotate', $(this).is(':visible'));
+		});
+	});
+});
+               </script>
 		<?php
 		}
 	}
@@ -1291,6 +1365,691 @@ array(
 			)
 		) );
 
+
+      //Alpha颜色选择器控件
+
+      	/**
+	 * 阿尔法颜色（十六进制和RGBa）消毒
+	 *
+	 * @param  string	Input to be sanitized
+	 * @return string	Sanitized input
+	 */
+	if ( ! function_exists( 'skyrocket_hex_rgba_sanitization_f' ) ) {
+		function skyrocket_hex_rgba_sanitization_f( $input, $setting ) {
+			if ( empty( $input ) || is_array( $input ) ) {
+				return $setting->default;
+			}
+
+			if ( false === strpos( $input, 'rgba' ) ) {
+				// If string doesn't start with 'rgba' then santize as hex color
+				$input = sanitize_hex_color( $input );
+			} else {
+				// Sanitize as RGBa color
+				$input = str_replace( ' ', '', $input );
+				sscanf( $input, 'rgba(%d,%d,%d,%f)', $red, $green, $blue, $alpha );
+				$input = 'rgba(' . skyrocket_in_range( $red, 0, 255 ) . ',' . skyrocket_in_range( $green, 0, 255 ) . ',' . skyrocket_in_range( $blue, 0, 255 ) . ',' . skyrocket_in_range( $alpha, 0, 1 ) . ')';
+			}
+			return $input;
+		}
+	}
+
+   /**
+	 * Alpha Color Picker Custom Control
+	 *
+	 * @author Braad Martin <http://braadmartin.com>
+	 * @license http://www.gnu.org/licenses/gpl-3.0.html
+	 * @link https://github.com/BraadMartin/components/tree/master/customizer/alpha-color-picker
+	 */
+	class Skyrocket_Customize_Alpha_Color_Control_f extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'alpha-color-f';
+		/**
+		 * Add support for palettes to be passed in.
+		 *
+		 * Supported palette values are true, false, or an array of RGBa and Hex colors.
+		 */
+		public $palette;
+		/**
+		 * Add support for showing the opacity value on the slider handle.
+		 */
+		public $show_opacity;
+		/**
+		 * Enqueue our scripts and styles
+		 */
+		public function enqueue() {
+			//wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
+			//wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+		}
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content() {
+
+			// Process the palette
+			if ( is_array( $this->palette ) ) {
+				$palette = implode( '|', $this->palette );
+			} else {
+				// Default to true.
+				$palette = ( false === $this->palette || 'false' === $this->palette ) ? 'false' : 'true';
+			}
+
+			// Support passing show_opacity as string or boolean. Default to true.
+			$show_opacity = ( false === $this->show_opacity || 'false' === $this->show_opacity ) ? 'false' : 'true';
+
+			?>
+				<label>
+					<?php // Output the label and description if they were passed in.
+					if ( isset( $this->label ) && '' !== $this->label ) {
+						echo '<span class="customize-control-title">' . sanitize_text_field( $this->label ) . '</span>';
+					}
+					if ( isset( $this->description ) && '' !== $this->description ) {
+						echo '<span class="description customize-control-description">' . sanitize_text_field( $this->description ) . '</span>';
+					} ?>
+				</label>
+				<input class="alpha-color-control" type="text" data-show-opacity="<?php echo $show_opacity; ?>" data-palette="<?php echo esc_attr( $palette ); ?>" data-default-color="<?php echo esc_attr( $this->settings['default']->default ); ?>" <?php $this->link(); ?>  />
+
+            <style>
+               /* ==========================================================================
+   Alpha颜色选择器
+   ========================================================================== */
+.customize-control-alpha-color .wp-picker-container .iris-picker {
+	border-bottom:none;
+}
+
+.customize-control-alpha-color .wp-picker-container {
+	max-width: 257px;
+}
+
+.customize-control-alpha-color .wp-picker-open + .wp-picker-input-wrap {
+	width: 100%;
+}
+
+.customize-control-alpha-color .wp-picker-input-wrap input[type="text"].wp-color-picker.alpha-color-control {
+	float: left;
+	width: 195px;
+}
+
+.customize-control-alpha-color .wp-picker-input-wrap .button {
+	margin-left: 0;
+	float: right;
+}
+
+.wp-picker-container .wp-picker-open ~ .wp-picker-holder .alpha-color-picker-container {
+	display: block;
+}
+
+.alpha-color-picker-container {
+	border: 1px solid #dfdfdf;
+	border-top: none;
+	display: none;
+	background-color: #fff;
+	padding: 0 11px 10px;
+	position: relative;
+}
+
+.alpha-color-picker-container .ui-widget-content,
+.alpha-color-picker-container .ui-widget-header,
+.alpha-color-picker-wrap .ui-state-focus {
+	background: transparent;
+	border: none;
+}
+
+.alpha-color-picker-wrap a.iris-square-value:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.alpha-color-picker-container .ui-slider {
+	position: relative;
+	z-index: 1;
+	height: 24px;
+	text-align: center;
+	margin: 0 auto;
+	width: 88%;
+	width: calc( 100% - 28px );
+}
+
+.alpha-color-picker-container .ui-slider-handle,
+.alpha-color-picker-container .ui-widget-content .ui-state-default {
+	color: #777;
+	background-color: #fff;
+	text-shadow: 0 1px 0 #fff;
+	text-decoration: none;
+	position: absolute;
+	z-index: 2;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+	border: 1px solid #aaa;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	margin-top: -2px;
+	top: 0;
+	height: 26px;
+	width: 26px;
+	cursor: ew-resize;
+	font-size: 0;
+	padding: 0;
+	line-height: 27px;
+	margin-left: -14px;
+}
+.alpha-color-picker-container .ui-slider-handle.show-opacity {
+	font-size: 12px;
+}
+
+.alpha-color-picker-container .click-zone {
+	width: 14px;
+	height: 24px;
+	display: block;
+	position: absolute;
+	left: 10px;
+}
+
+.alpha-color-picker-container .max-click-zone {
+	right: 10px;
+	left: auto;
+}
+
+.alpha-color-picker-container .transparency {
+	height: 24px;
+	width: 100%;
+	background-color: #fff;
+	background-image: url(<?php echo plugin_dir_url( __DIR__ ) . 'public/images/color-picker-transparency-grid.png'; ?>);
+	box-shadow: 0 0 5px rgba(0,0,0,0.4) inset;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	padding: 0;
+	margin-top: -24px;
+}
+
+@media only screen and (max-width: 782px) {
+	.customize-control-alpha-color .wp-picker-input-wrap input[type="text"].wp-color-picker.alpha-color-control {
+		width: 184px;
+	}
+}
+
+@media only screen and (max-width: 640px) {
+	.customize-control-alpha-color .wp-picker-input-wrap input[type="text"].wp-color-picker.alpha-color-control {
+		width: 172px;
+		height: 33px;
+	}
+}
+               </style>
+               
+               <script>
+                  jQuery( document ).ready(function($) {
+	"use strict";
+	/**
+ 	 * Alpha颜色选取器自定义控件
+ 	 *
+ 	 * @author Braad Martin <http://braadmartin.com>
+ 	 * @license http://www.gnu.org/licenses/gpl-3.0.html
+ 	 * @link https://github.com/BraadMartin/components/tree/master/customizer/alpha-color-picker
+ 	 */
+
+	// 循环每个控件并将其转换为我们的颜色选择器。
+	$( '.alpha-color-control' ).each( function() {
+
+		// Scope the vars.
+		var $control, startingColor, paletteInput, showOpacity, defaultColor, palette,
+			colorPickerOptions, $container, $alphaSlider, alphaVal, sliderOptions;
+
+		// Store the control instance.
+		$control = $( this );
+
+		// Get a clean starting value for the option.
+		startingColor = $control.val().replace( /\s+/g, '' );
+
+		// Get some data off the control.
+		paletteInput = $control.attr( 'data-palette' );
+		showOpacity  = $control.attr( 'data-show-opacity' );
+		defaultColor = $control.attr( 'data-default-color' );
+
+		// Process the palette.
+		if ( paletteInput.indexOf( '|' ) !== -1 ) {
+			palette = paletteInput.split( '|' );
+		} else if ( 'false' == paletteInput ) {
+			palette = false;
+		} else {
+			palette = true;
+		}
+
+		// Set up the options that we'll pass to wpColorPicker().
+		colorPickerOptions = {
+			change: function( event, ui ) {
+				var key, value, alpha, $transparency;
+
+				key = $control.attr( 'data-customize-setting-link' );
+				value = $control.wpColorPicker( 'color' );
+
+				// Set the opacity value on the slider handle when the default color button is clicked.
+				if ( defaultColor == value ) {
+					alpha = acp_get_alpha_value_from_color( value );
+					$alphaSlider.find( '.ui-slider-handle' ).text( alpha );
+				}
+
+				// Send ajax request to wp.customize to trigger the Save action.
+				wp.customize( key, function( obj ) {
+					obj.set( value );
+				});
+
+				$transparency = $container.find( '.transparency' );
+
+				// Always show the background color of the opacity slider at 100% opacity.
+				$transparency.css( 'background-color', ui.color.toString( 'no-alpha' ) );
+			},
+			palettes: palette // Use the passed in palette.
+		};
+
+		// Create the colorpicker.
+		$control.wpColorPicker( colorPickerOptions );
+
+		$container = $control.parents( '.wp-picker-container:first' );
+
+		// Insert our opacity slider.
+		$( '<div class="alpha-color-picker-container">' +
+				'<div class="min-click-zone click-zone"></div>' +
+				'<div class="max-click-zone click-zone"></div>' +
+				'<div class="alpha-slider"></div>' +
+				'<div class="transparency"></div>' +
+			'</div>' ).appendTo( $container.find( '.wp-picker-holder' ) );
+
+		$alphaSlider = $container.find( '.alpha-slider' );
+
+		// If starting value is in format RGBa, grab the alpha channel.
+		alphaVal = acp_get_alpha_value_from_color( startingColor );
+
+		// Set up jQuery UI slider() options.
+		sliderOptions = {
+			create: function( event, ui ) {
+				var value = $( this ).slider( 'value' );
+
+				// Set up initial values.
+				$( this ).find( '.ui-slider-handle' ).text( value );
+				$( this ).siblings( '.transparency ').css( 'background-color', startingColor );
+			},
+			value: alphaVal,
+			range: 'max',
+			step: 1,
+			min: 0,
+			max: 100,
+			animate: 300
+		};
+
+		// Initialize jQuery UI slider with our options.
+		$alphaSlider.slider( sliderOptions );
+
+		// Maybe show the opacity on the handle.
+		if ( 'true' == showOpacity ) {
+			$alphaSlider.find( '.ui-slider-handle' ).addClass( 'show-opacity' );
+		}
+
+		// Bind event handlers for the click zones.
+		$container.find( '.min-click-zone' ).on( 'click', function() {
+			acp_update_alpha_value_on_color_control( 0, $control, $alphaSlider, true );
+		});
+		$container.find( '.max-click-zone' ).on( 'click', function() {
+			acp_update_alpha_value_on_color_control( 100, $control, $alphaSlider, true );
+		});
+
+		// Bind event handler for clicking on a palette color.
+		$container.find( '.iris-palette' ).on( 'click', function() {
+			var color, alpha;
+
+			color = $( this ).css( 'background-color' );
+			alpha = acp_get_alpha_value_from_color( color );
+
+			acp_update_alpha_value_on_alpha_slider( alpha, $alphaSlider );
+
+			// Sometimes Iris doesn't set a perfect background-color on the palette,
+			// for example rgba(20, 80, 100, 0.3) becomes rgba(20, 80, 100, 0.298039).
+			// To compensante for this we round the opacity value on RGBa colors here
+			// and save it a second time to the color picker object.
+			if ( alpha != 100 ) {
+				color = color.replace( /[^,]+(?=\))/, ( alpha / 100 ).toFixed( 2 ) );
+			}
+
+			$control.wpColorPicker( 'color', color );
+		});
+
+		// Bind event handler for clicking on the 'Clear' button.
+		$container.find( '.button.wp-picker-clear' ).on( 'click', function() {
+			var key = $control.attr( 'data-customize-setting-link' );
+
+			// The #fff color is delibrate here. This sets the color picker to white instead of the
+			// defult black, which puts the color picker in a better place to visually represent empty.
+			$control.wpColorPicker( 'color', '#ffffff' );
+
+			// Set the actual option value to empty string.
+			wp.customize( key, function( obj ) {
+				obj.set( '' );
+			});
+
+			acp_update_alpha_value_on_alpha_slider( 100, $alphaSlider );
+		});
+
+		// Bind event handler for clicking on the 'Default' button.
+		$container.find( '.button.wp-picker-default' ).on( 'click', function() {
+			var alpha = acp_get_alpha_value_from_color( defaultColor );
+
+			acp_update_alpha_value_on_alpha_slider( alpha, $alphaSlider );
+		});
+
+		// Bind event handler for typing or pasting into the input.
+		$control.on( 'input', function() {
+			var value = $( this ).val();
+			var alpha = acp_get_alpha_value_from_color( value );
+
+			acp_update_alpha_value_on_alpha_slider( alpha, $alphaSlider );
+		});
+
+		// Update all the things when the slider is interacted with.
+		$alphaSlider.slider().on( 'slide', function( event, ui ) {
+			var alpha = parseFloat( ui.value ) / 100.0;
+
+			acp_update_alpha_value_on_color_control( alpha, $control, $alphaSlider, false );
+
+			// Change value shown on slider handle.
+			$( this ).find( '.ui-slider-handle' ).text( ui.value );
+		});
+
+	});
+
+	/**
+	 * 重写stock-color.js-toString（）方法以添加对输出RGBa或Hex的支持。
+	 */
+	Color.prototype.toString = function( flag ) {
+
+		// If our no-alpha flag has been passed in, output RGBa value with 100% opacity.
+		// This is used to set the background color on the opacity slider during color changes.
+		if ( 'no-alpha' == flag ) {
+			return this.toCSS( 'rgba', '1' ).replace( /\s+/g, '' );
+		}
+
+		// If we have a proper opacity value, output RGBa.
+		if ( 1 > this._alpha ) {
+			return this.toCSS( 'rgba', this._alpha ).replace( /\s+/g, '' );
+		}
+
+		// Proceed with stock color.js hex output.
+		var hex = parseInt( this._color, 10 ).toString( 16 );
+		if ( this.error ) { return ''; }
+		if ( hex.length < 6 ) {
+			for ( var i = 6 - hex.length - 1; i >= 0; i-- ) {
+				hex = '0' + hex;
+			}
+		}
+
+		return '#' + hex;
+	};
+
+	/**
+	 * 给定RGBa、RGB或十六进制颜色值，返回alpha通道值。
+	 */
+	function acp_get_alpha_value_from_color( value ) {
+		var alphaVal;
+
+		// Remove all spaces from the passed in value to help our RGBa regex.
+		value = value.replace( / /g, '' );
+
+		if ( value.match( /rgba\(\d+\,\d+\,\d+\,([^\)]+)\)/ ) ) {
+			alphaVal = parseFloat( value.match( /rgba\(\d+\,\d+\,\d+\,([^\)]+)\)/ )[1] ).toFixed(2) * 100;
+			alphaVal = parseInt( alphaVal );
+		} else {
+			alphaVal = 100;
+		}
+
+		return alphaVal;
+	}
+
+	/**
+	 * 强制更新颜色选择器对象的alpha值，可能还有alpha滑块。
+	 */
+	 function acp_update_alpha_value_on_color_control( alpha, $control, $alphaSlider, update_slider ) {
+		var iris, colorPicker, color;
+
+		iris = $control.data( 'a8cIris' );
+		colorPicker = $control.data( 'wpWpColorPicker' );
+
+		// Set the alpha value on the Iris object.
+		iris._color._alpha = alpha;
+
+		// Store the new color value.
+		color = iris._color.toString();
+
+		// Set the value of the input.
+		$control.val( color );
+
+		// Update the background color of the color picker.
+		colorPicker.toggler.css({
+			'background-color': color
+		});
+
+		// Maybe update the alpha slider itself.
+		if ( update_slider ) {
+			acp_update_alpha_value_on_alpha_slider( alpha, $alphaSlider );
+		}
+
+		// Update the color value of the color picker object.
+		$control.wpColorPicker( 'color', color );
+	}
+
+	/**
+	 * 更新滑块控制柄位置和标签。
+	 */
+	function acp_update_alpha_value_on_alpha_slider( alpha, $alphaSlider ) {
+		$alphaSlider.slider( 'value', alpha );
+		$alphaSlider.find( '.ui-slider-handle' ).text( alpha.toString() );
+	}
+
+});
+
+
+                  </script>
+                 
+			<?php
+		}
+	}
+
+
+      		// Alpha颜色选择器控件测试
+		$wp_customize->add_setting( 'sample_alpha_color_f',
+      array(
+         'default' => 'rgba(209,0,55,0.7)',
+         'transport' => 'postMessage',
+         'sanitize_callback' => 'skyrocket_hex_rgba_sanitization_f'
+      )
+   );
+   $wp_customize->add_control( new Skyrocket_Customize_Alpha_Color_Control_f( $wp_customize, 'sample_alpha_color_f',
+      array(
+         'label' => __( 'Alpha颜色选取器控件', 'skyrocket' ),
+         'description' => esc_html__( '简单描述', 'skyrocket' ),
+         'section' => 'section_pro',
+         'show_opacity' => true,
+         'palette' => array(
+            '#000',
+            '#fff',
+            '#df312c',
+            '#df9a23',
+            '#eef000',
+            '#7ed934',
+            '#1571c1',
+            '#8309e7'
+         )
+      )
+   ) );
+
+
+   //WPColorPicker Alpha颜色选择器
+
+   	/**
+	 * 阿尔法颜色（十六进制和RGBa）消毒
+	 *
+	 * @param  string	Input to be sanitized
+	 * @return string	Sanitized input
+	 */
+	if ( ! function_exists( 'skyrocket_hex_rgba_sanitization_a' ) ) {
+		function skyrocket_hex_rgba_sanitization_a( $input, $setting ) {
+			if ( empty( $input ) || is_array( $input ) ) {
+				return $setting->default;
+			}
+
+			if ( false === strpos( $input, 'rgba' ) ) {
+				// If string doesn't start with 'rgba' then santize as hex color
+				$input = sanitize_hex_color( $input );
+			} else {
+				// Sanitize as RGBa color
+				$input = str_replace( ' ', '', $input );
+				sscanf( $input, 'rgba(%d,%d,%d,%f)', $red, $green, $blue, $alpha );
+				$input = 'rgba(' . skyrocket_in_range( $red, 0, 255 ) . ',' . skyrocket_in_range( $green, 0, 255 ) . ',' . skyrocket_in_range( $blue, 0, 255 ) . ',' . skyrocket_in_range( $alpha, 0, 1 ) . ')';
+			}
+			return $input;
+		}
+	}
+
+
+   	/**
+	 * WPColorPicker Alpha颜色选择器自定义控件
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 *
+	 * 支持Alpha通道的WPColorPicker脚本的Props@kallookoo
+	 *
+	 * @author Sergio <https://github.com/kallookoo>
+	 * @license http://www.gnu.org/licenses/gpl-3.0.html
+	 * @link https://github.com/kallookoo/wp-color-picker-alpha
+	 */
+	class Skyrocket_Alpha_Color_Control_a extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'wpcolorpicker-alpha-color_a';
+		/**
+		 * ColorPicker Attributes
+		 */
+		public $attributes = "";
+		/**
+		 * Color palette defaults
+		 */
+		public $defaultPalette = array(
+			'#000000',
+			'#ffffff',
+			'#dd3333',
+			'#dd9933',
+			'#eeee22',
+			'#81d742',
+			'#1e73be',
+			'#8224e3',
+		);
+		/**
+		 * Constructor
+		 */
+		public function __construct( $manager, $id, $args = array(), $options = array() ) {
+			parent::__construct( $manager, $id, $args );
+			$this->attributes .= 'data-default-color="' . esc_attr( $this->value() ) . '"';
+			$this->attributes .= 'data-alpha="true"';
+			$this->attributes .= 'data-reset-alpha="' . ( isset( $this->input_attrs['resetalpha'] ) ? $this->input_attrs['resetalpha'] : 'true' ) . '"';
+			$this->attributes .= 'data-custom-width="0"';
+		}
+		/**
+		 * Enqueue our scripts and styles
+		 */
+		public function enqueue() {
+        
+			//wp_enqueue_style( 'skyrocket-custom-controls-css', plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+			wp_enqueue_script( 'wp-color-picker-alpha',  plugin_dir_url( __DIR__ )  . 'public/js/wp-color-picker-alpha.js', array( 'wp-color-picker' ), '1.0', true );
+			//wp_enqueue_style( 'wp-color-picker' );
+		}
+		/**
+		 * Pass our Palette colours to JavaScript
+		 */
+		public function to_json() {
+			parent::to_json();
+			$this->json['colorpickerpalette'] = isset( $this->input_attrs['palette'] ) ? $this->input_attrs['palette'] : $this->defaultPalette;
+		}
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content() {
+		?>
+		  <div class="wpcolorpicker_alpha_color_control">
+				<?php if( !empty( $this->label ) ) { ?>
+					<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+				<?php } ?>
+				<?php if( !empty( $this->description ) ) { ?>
+					<span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
+				<?php } ?>
+				<input type="text" class="color-picker" id="<?php echo esc_attr( $this->id ); ?>" name="<?php echo esc_attr( $this->id ); ?>" value="<?php echo esc_attr( $this->value() ); ?>" class="customize-control-colorpicker-alpha-color" <?php echo $this->attributes; ?> <?php $this->link(); ?> />
+			</div>
+         <style>
+            </style>
+            <script>
+               
+               </script>
+		<?php
+		}
+	}
+
+   		// WPColorPicker Alpha颜色选择器控件的测试
+		$wp_customize->add_setting( 'sample_wpcolorpicker_alpha_color_a',
+      array(
+         'default' => 'rgba(55,55,55,0.5)',
+         'transport' => 'refresh',
+         'sanitize_callback' => 'skyrocket_hex_rgba_sanitization_a'
+      )
+   );
+   $wp_customize->add_control( new Skyrocket_Alpha_Color_Control_a( $wp_customize, 'sample_wpcolorpicker_alpha_color_a',
+      array(
+         'label' => __( 'WP颜色选择器Alpha颜色选择器', 'skyrocket' ),
+         'description' => esc_html__( 'Sample color control with Alpha channel', 'skyrocket' ),
+         'section' => 'section_pro',
+         'input_attrs' => array(
+            'palette' => array(
+               '#000000',
+               '#ffffff',
+               '#dd3333',
+               '#dd9933',
+               '#eeee22',
+               '#81d742',
+               '#1e73be',
+               '#8224e3',
+            )
+         ),
+      )
+   ) );
+
+   // WPColorPicker Alpha颜色选择器控件的另一个测试
+   $wp_customize->add_setting( 'sample_wpcolorpicker_alpha_color2_a',
+      array(
+         'default' => 'rgba(33,33,33,0.8)',
+         'transport' => 'refresh',
+         'sanitize_callback' => 'skyrocket_hex_rgba_sanitization_a'
+      )
+   );
+   $wp_customize->add_control( new Skyrocket_Alpha_Color_Control_a( $wp_customize, 'sample_wpcolorpicker_alpha_color2_a',
+      array(
+         'label' => __( 'WP颜色选择器Alpha颜色选择器', 'skyrocket' ),
+         'description' => esc_html__( 'Sample color control with Alpha channel', 'skyrocket' ),
+         'section' => 'section_pro',
+         'input_attrs' => array(
+            'resetalpha' => false,
+            'palette' => array(
+               'rgba(99,78,150,1)',
+               'rgba(67,78,150,1)',
+               'rgba(34,78,150,.7)',
+               'rgba(3,78,150,1)',
+               'rgba(7,110,230,.9)',
+               'rgba(234,78,150,1)',
+               'rgba(99,78,150,.5)',
+               'rgba(190,120,120,.5)',
+            ),
+         ),
+      )
+   ) );
 
    /**
     * WP_Customize_Control

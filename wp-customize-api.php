@@ -60,7 +60,7 @@ if ( ! function_exists( 'skyrocket_scripts_styles_a' ) ) {
 		wp_enqueue_style( 'fontawesome' );
 	}
 }
-add_action( 'wp_enqueue_scripts', 'skyrocket_scripts_styles_a' );
-add_action( 'customize_controls_print_styles', 'skyrocket_scripts_styles_a' );
+add_action( 'wp_enqueue_scripts', 'skyrocket_scripts_styles_a' );//前台
+add_action( 'customize_controls_print_styles', 'skyrocket_scripts_styles_a' );//自定义控件
 
         ?>

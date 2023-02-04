@@ -11,15 +11,18 @@ Author URI: http://URI_Of_The_Plugin_Author作者地址
 //基础功能演示
 require_once dirname( __FILE__ ) . '/options/basic-demo.php' ;
 
-//自定义控件
+//自定义控件 - 基础
 require_once dirname( __FILE__ ) . '/options/custom-control.php' ;
+
+//自定义控件 - 高级
+require_once dirname( __FILE__ ) . '/options/custom-control-pro.php' ;
 
 //最小化的控件
 //require_once dirname( __FILE__ ) . '/options/demo.php' ;
 //测试控件
 //require_once dirname( __FILE__ ) . '/test.php' ;
 
-add_action( 'wp_head', 'test_tops' );
+//add_action( 'wp_head', 'test_tops' );
 
 function test_tops() {
 
@@ -32,9 +35,10 @@ function test_tops() {
 ;
 
 //加载图标
+
 function THEMENAME_custom_customize_enqueue() {
     wp_enqueue_style( 'customizer-css', plugin_dir_url( __FILE__ ) . 'public/css/customizer-css.css' );
-    }
-    add_action( 'customize_controls_enqueue_scripts', 'THEMENAME_custom_customize_enqueue' );
+}
+add_action( 'customize_controls_enqueue_scripts', 'THEMENAME_custom_customize_enqueue' );
 
 ?>

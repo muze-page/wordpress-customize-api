@@ -1008,9 +1008,32 @@ array(
 			)
 		) );
 
-
+//图像复选框自定义控件
+	/**
+	 * 文本净化
+	 *
+	 * @param  string	要清理的输入（包含单个字符串或多个字符串，用逗号分隔）
+	 * @return string	Sanitized input
+	 */
+	if ( ! function_exists( 'skyrocket_text_sanitization_d' ) ) {
+		function skyrocket_text_sanitization_d( $input ) {
+			if ( strpos( $input, ',' ) !== false) {
+				$input = explode( ',', $input );
+			}
+			if( is_array( $input ) ) {
+				foreach ( $input as $key => $value ) {
+					$input[$key] = sanitize_text_field( $value );
+				}
+				$input = implode( ',', $input );
+			}
+			else {
+				$input = sanitize_text_field( $input );
+			}
+			return $input;
+		}
+	}
       /**
-	 * 图像复选框自定义控件
+	 * 
 	 *
 	 * @author Anthony Hortin <http://maddisondesigns.com>
 	 * @license http://www.gnu.org/licenses/gpl-2.0.html
@@ -1104,7 +1127,7 @@ array(
         array(
             'default' => 'stylebold,styleallcaps',
             'transport' => 'refresh',
-            //'sanitize_callback' => 'skyrocket_text_sanitization_d'
+            'sanitize_callback' => 'skyrocket_text_sanitization_d'
         )
     );
     $wp_customize->add_control( new Skyrocket_Image_checkbox_Custom_Control_d( $wp_customize, 'sample_image_checkbox_d',
@@ -1132,6 +1155,142 @@ array(
             )
         )
     ) );
+
+
+    //手风琴控件
+    	/**
+	 * 文本净化
+	 *
+	 * @param  string	要清理的输入（包含单个字符串或多个字符串，用逗号分隔）
+	 * @return string	Sanitized input
+	 */
+	if ( ! function_exists( 'skyrocket_text_sanitization_f' ) ) {
+		function skyrocket_text_sanitization_f( $input ) {
+			if ( strpos( $input, ',' ) !== false) {
+				$input = explode( ',', $input );
+			}
+			if( is_array( $input ) ) {
+				foreach ( $input as $key => $value ) {
+					$input[$key] = sanitize_text_field( $value );
+				}
+				$input = implode( ',', $input );
+			}
+			else {
+				$input = sanitize_text_field( $input );
+			}
+			return $input;
+		}
+	}
+
+   	/**
+	 * Single Accordion Custom Control
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+	class Skyrocket_Single_Accordion_Custom_Control_f extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'single_accordion';
+		/**
+		 * Enqueue our scripts and styles
+		 */
+		public function enqueue() {
+			wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
+			wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+		}
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content() {
+			$allowed_html = array(
+				'a' => array(
+					'href' => array(),
+					'title' => array(),
+					'class' => array(),
+					'target' => array(),
+				),
+				'br' => array(),
+				'em' => array(),
+				'strong' => array(),
+				'i' => array(
+					'class' => array()
+				),
+			);
+		?>
+			<div class="single-accordion-custom-control">
+				<div class="single-accordion-toggle"><?php echo esc_html( $this->label ); ?><span class="accordion-icon-toggle dashicons dashicons-plus"></span></div>
+				<div class="single-accordion customize-control-description">
+					<?php
+						if ( is_array( $this->description ) ) {
+							echo '<ul class="single-accordion-description">';
+							foreach ( $this->description as $key => $value ) {
+								echo '<li>' . $key . wp_kses( $value, $allowed_html ) . '</li>';
+							}
+							echo '</ul>';
+						}
+						else {
+							echo wp_kses( $this->description, $allowed_html );
+						}
+				  ?>
+				</div>
+			</div>
+		<?php
+		}
+	}
+
+    		// 单手风琴控制测试
+		$sampleIconsList = array(
+			'Behance' => __( '<i class="fab fa-behance"></i>', 'skyrocket' ),
+			'Bitbucket' => __( '<i class="fab fa-bitbucket"></i>', 'skyrocket' ),
+			'CodePen' => __( '<i class="fab fa-codepen"></i>', 'skyrocket' ),
+			'DeviantArt' => __( '<i class="fab fa-deviantart"></i>', 'skyrocket' ),
+			'Discord' => __( '<i class="fab fa-discord"></i>', 'skyrocket' ),
+			'Dribbble' => __( '<i class="fab fa-dribbble"></i>', 'skyrocket' ),
+			'Etsy' => __( '<i class="fab fa-etsy"></i>', 'skyrocket' ),
+			'Facebook' => __( '<i class="fab fa-facebook-f"></i>', 'skyrocket' ),
+			'Flickr' => __( '<i class="fab fa-flickr"></i>', 'skyrocket' ),
+			'Foursquare' => __( '<i class="fab fa-foursquare"></i>', 'skyrocket' ),
+			'GitHub' => __( '<i class="fab fa-github"></i>', 'skyrocket' ),
+			'Google+' => __( '<i class="fab fa-google-plus-g"></i>', 'skyrocket' ),
+			'Instagram' => __( '<i class="fab fa-instagram"></i>', 'skyrocket' ),
+			'Kickstarter' => __( '<i class="fab fa-kickstarter-k"></i>', 'skyrocket' ),
+			'Last.fm' => __( '<i class="fab fa-lastfm"></i>', 'skyrocket' ),
+			'LinkedIn' => __( '<i class="fab fa-linkedin-in"></i>', 'skyrocket' ),
+			'Medium' => __( '<i class="fab fa-medium-m"></i>', 'skyrocket' ),
+			'Patreon' => __( '<i class="fab fa-patreon"></i>', 'skyrocket' ),
+			'Pinterest' => __( '<i class="fab fa-pinterest-p"></i>', 'skyrocket' ),
+			'Reddit' => __( '<i class="fab fa-reddit-alien"></i>', 'skyrocket' ),
+			'Slack' => __( '<i class="fab fa-slack-hash"></i>', 'skyrocket' ),
+			'SlideShare' => __( '<i class="fab fa-slideshare"></i>', 'skyrocket' ),
+			'Snapchat' => __( '<i class="fab fa-snapchat-ghost"></i>', 'skyrocket' ),
+			'SoundCloud' => __( '<i class="fab fa-soundcloud"></i>', 'skyrocket' ),
+			'Spotify' => __( '<i class="fab fa-spotify"></i>', 'skyrocket' ),
+			'Stack Overflow' => __( '<i class="fab fa-stack-overflow"></i>', 'skyrocket' ),
+			'Tumblr' => __( '<i class="fab fa-tumblr"></i>', 'skyrocket' ),
+			'Twitch' => __( '<i class="fab fa-twitch"></i>', 'skyrocket' ),
+			'Twitter' => __( '<i class="fab fa-twitter"></i>', 'skyrocket' ),
+			'Vimeo' => __( '<i class="fab fa-vimeo-v"></i>', 'skyrocket' ),
+			'Weibo' => __( '<i class="fab fa-weibo"></i>', 'skyrocket' ),
+			'YouTube' => __( '<i class="fab fa-youtube"></i>', 'skyrocket' ),
+		);
+		$wp_customize->add_setting( 'sample_single_accordion_f',
+			array(
+				'default' => '',
+				'transport' => 'refresh',
+				'sanitize_callback' => 'skyrocket_text_sanitization_f'
+			)
+		);
+		$wp_customize->add_control( new Skyrocket_Single_Accordion_Custom_Control_f( $wp_customize, 'sample_single_accordion_f',
+			array(
+				'label' => __( '单手风琴控制', 'skyrocket' ),
+				'description' => $sampleIconsList,
+				'section' => 'section_pro'
+			)
+		) );
+
 
    /**
     * WP_Customize_Control

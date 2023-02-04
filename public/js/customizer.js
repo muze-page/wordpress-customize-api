@@ -2,14 +2,14 @@ jQuery( document ).ready(function($) {
 	"use strict";
 
 	/**
-	 * Sortable Repeater Custom Control
+	 * 可排序中继器自定义控件
 	 *
 	 * @author Anthony Hortin <http://maddisondesigns.com>
 	 * @license http://www.gnu.org/licenses/gpl-2.0.html
 	 * @link https://github.com/maddisondesigns
 	 */
 
-	// Update the values for all our input fields and initialise the sortable repeater
+	// 更新所有输入字段的值并初始化可排序中继器
 	$('.sortable_repeater_control').each(function() {
 		// If there is an existing customizer value, populate our rows
 		var defaultValuesArray = $(this).find('.customize-control-sortable-repeater').val().split(',');
@@ -75,7 +75,7 @@ jQuery( document ).ready(function($) {
 		}
 	});
 
-	// Append a new row to our list of elements
+	// 将新行附加到元素列表
 	function skyrocketAppendRow($element, defaultValue = '') {
 		var newRow = '<div class="repeater" style="display:none"><input type="text" value="' + defaultValue + '" class="repeater-input" placeholder="https://" /><span class="dashicons dashicons-sort"></span><a class="customize-control-sortable-repeater-delete" href="#"><span class="dashicons dashicons-no-alt"></span></a></div>';
 
@@ -85,7 +85,7 @@ jQuery( document ).ready(function($) {
 		});
 	}
 
-	// Get the values from the repeater input fields and add to our hidden field
+	// 从中继器输入字段获取值并添加到隐藏字段
 	function skyrocketGetAllInputs($element) {
 		var inputValues = $element.find('.repeater-input').map(function() {
 			return $(this).val();
@@ -97,7 +97,7 @@ jQuery( document ).ready(function($) {
 	}
 
 	/**
-	 * Slider Custom Control
+	 * 滑块自定义控件
 	 *
 	 * @author Anthony Hortin <http://maddisondesigns.com>
 	 * @license http://www.gnu.org/licenses/gpl-2.0.html
@@ -156,7 +156,7 @@ jQuery( document ).ready(function($) {
 	});
 
 	/**
-	 * Single Accordion Custom Control
+	 * 单手风琴自定义控件
 	 *
 	 * @author Anthony Hortin <http://maddisondesigns.com>
 	 * @license http://www.gnu.org/licenses/gpl-2.0.html
@@ -171,7 +171,7 @@ jQuery( document ).ready(function($) {
 	});
 
 	/**
-	 * Image Checkbox Custom Control
+	 * 图像复选框自定义控件
 	 *
 	 * @author Anthony Hortin <http://maddisondesigns.com>
 	 * @license http://www.gnu.org/licenses/gpl-2.0.html
@@ -182,7 +182,7 @@ jQuery( document ).ready(function($) {
 	  skyrocketGetAllImageCheckboxes($(this).parent().parent());
 	});
 
-	// Get the values from the checkboxes and add to our hidden field
+	// 从复选框中获取值并添加到隐藏字段
 	function skyrocketGetAllImageCheckboxes($element) {
 	  var inputValues = $element.find('.multi-image-checkbox').map(function() {
 	    if( $(this).is(':checked') ) {
@@ -194,7 +194,7 @@ jQuery( document ).ready(function($) {
 	}
 
 	/**
-	 * Pill Checkbox Custom Control
+	 * 药丸复选框自定义控件
 	 *
 	 * @author Anthony Hortin <http://maddisondesigns.com>
 	 * @license http://www.gnu.org/licenses/gpl-2.0.html
@@ -212,7 +212,7 @@ jQuery( document ).ready(function($) {
 		skyrocketGetAllPillCheckboxes($(this).parent().parent().parent());
 	});
 
-	// Get the values from the checkboxes and add to our hidden field
+	// 从复选框中获取值并添加到隐藏字段
 	function skyrocketGetAllPillCheckboxes($element) {
 		var inputValues = $element.find('.sortable-pill-checkbox').map(function() {
 			if( $(this).is(':checked') ) {
@@ -223,7 +223,7 @@ jQuery( document ).ready(function($) {
 	}
 
 	/**
-	 * Dropdown Select2 Custom Control
+	 * 下拉选择2自定义控件
 	 *
 	 * @author Anthony Hortin <http://maddisondesigns.com>
 	 * @license http://www.gnu.org/licenses/gpl-2.0.html
@@ -242,7 +242,7 @@ jQuery( document ).ready(function($) {
 	});
 
 	/**
-	 * Googe Font Select Custom Control
+	 * 谷歌字体选择自定义控件
 	 *
 	 * @author Anthony Hortin <http://maddisondesigns.com>
 	 * @license http://www.gnu.org/licenses/gpl-2.0.html
@@ -283,7 +283,7 @@ jQuery( document ).ready(function($) {
 		});
 		var index = indexes[0];
 
-		// For the selected Google font show the available weight/style variants
+		// 对于选定的Google字体，显示可用的权重/样式变体
 		$.each(bodyfontcontrol.skyrocketfontslist[index].variants, function(val, text) {
 			elementRegularWeight.append(
 				$('<option></option>').val(text).html(text)
@@ -338,7 +338,7 @@ jQuery( document ).ready(function($) {
 	}
 
 	/**
-	 * TinyMCE Custom Control
+	 * TinyMCE自定义控件
 	 *
 	 * @author Anthony Hortin <http://maddisondesigns.com>
 	 * @license http://www.gnu.org/licenses/gpl-2.0.html
@@ -369,14 +369,14 @@ jQuery( document ).ready(function($) {
 	});
 
 	/**
- 	 * Alpha Color Picker Custom Control
+ 	 * Alpha颜色选取器自定义控件
  	 *
  	 * @author Braad Martin <http://braadmartin.com>
  	 * @license http://www.gnu.org/licenses/gpl-3.0.html
  	 * @link https://github.com/BraadMartin/components/tree/master/customizer/alpha-color-picker
  	 */
 
-	// Loop over each control and transform it into our color picker.
+	// 循环每个控件并将其转换为我们的颜色选择器。
 	$( '.alpha-color-control' ).each( function() {
 
 		// Scope the vars.
@@ -545,7 +545,7 @@ jQuery( document ).ready(function($) {
 	});
 
 	/**
-	 * Override the stock color.js toString() method to add support for outputting RGBa or Hex.
+	 * 重写stock-color.js-toString（）方法以添加对输出RGBa或Hex的支持。
 	 */
 	Color.prototype.toString = function( flag ) {
 
@@ -573,7 +573,7 @@ jQuery( document ).ready(function($) {
 	};
 
 	/**
-	 * Given an RGBa, RGB, or hex color value, return the alpha channel value.
+	 * 给定RGBa、RGB或十六进制颜色值，返回alpha通道值。
 	 */
 	function acp_get_alpha_value_from_color( value ) {
 		var alphaVal;
@@ -592,7 +592,7 @@ jQuery( document ).ready(function($) {
 	}
 
 	/**
-	 * Force update the alpha value of the color picker object and maybe the alpha slider.
+	 * 强制更新颜色选择器对象的alpha值，可能还有alpha滑块。
 	 */
 	 function acp_update_alpha_value_on_color_control( alpha, $control, $alphaSlider, update_slider ) {
 		var iris, colorPicker, color;
@@ -624,7 +624,7 @@ jQuery( document ).ready(function($) {
 	}
 
 	/**
-	 * Update the slider handle position and label.
+	 * 更新滑块控制柄位置和标签。
 	 */
 	function acp_update_alpha_value_on_alpha_slider( alpha, $alphaSlider ) {
 		$alphaSlider.slider( 'value', alpha );
@@ -634,7 +634,7 @@ jQuery( document ).ready(function($) {
 });
 
 /**
- * Remove attached events from the Upsell Section to stop panel from being able to open/close
+ * 从Upsell部分删除附加事件，以阻止面板打开/关闭
  */
 ( function( $, api ) {
 	api.sectionConstructor['skyrocket-upsell'] = api.Section.extend( {

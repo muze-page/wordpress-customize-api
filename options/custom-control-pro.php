@@ -495,6 +495,175 @@ $wp_customize->add_section( 'section_pro',
 
 
 
+    //可排序中继器
+
+
+	/**
+	 * URL sanitization
+	 *
+	 * @param  string	要清理的输入（包含单个url或多个url的字符串，用逗号分隔）
+	 * @return string	消毒输入
+	 */
+	if ( ! function_exists( 'skyrocket_url_sanitization_a' ) ) {
+		function skyrocket_url_sanitization_a( $input ) {
+			if ( strpos( $input, ',' ) !== false) {
+				$input = explode( ',', $input );
+			}
+			if ( is_array( $input ) ) {
+				foreach ($input as $key => $value) {
+					$input[$key] = esc_url_raw( $value );
+				}
+				$input = implode( ',', $input );
+			}
+			else {
+				$input = esc_url_raw( $input );
+			}
+			return $input;
+		}
+	}
+
+   	/**
+	 * Sortable Repeater Custom Control
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+	class Skyrocket_Sortable_Repeater_Custom_Control_c extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'sortable_repeater_c';
+		/**
+		 * Button labels
+		 */
+		public $button_labels = array();
+		/**
+		 * Constructor
+		 */
+		public function __construct( $manager, $id, $args = array(), $options = array() ) {
+			parent::__construct( $manager, $id, $args );
+			// Merge the passed button labels with our default labels
+			$this->button_labels = wp_parse_args( $this->button_labels,
+				array(
+					'add' => __( 'Add', 'skyrocket' ),
+				)
+			);
+		}
+		/**
+		 * Enqueue our scripts and styles
+		 */
+		public function enqueue() {
+			wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
+			//wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+		}
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content() {
+		?>
+		  <div class="sortable_repeater_control">
+				<?php if( !empty( $this->label ) ) { ?>
+					<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+				<?php } ?>
+				<?php if( !empty( $this->description ) ) { ?>
+					<span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
+				<?php } ?>
+				<input type="hidden" id="<?php echo esc_attr( $this->id ); ?>" name="<?php echo esc_attr( $this->id ); ?>" value="<?php echo esc_attr( $this->value() ); ?>" class="customize-control-sortable-repeater" <?php $this->link(); ?> />
+				<div class="sortable_repeater sortable">
+					<div class="repeater">
+						<input type="text" value="" class="repeater-input" placeholder="https://" /><span class="dashicons dashicons-sort"></span><a class="customize-control-sortable-repeater-delete" href="#"><span class="dashicons dashicons-no-alt"></span></a>
+					</div>
+				</div>
+				<button class="button customize-control-sortable-repeater-add" type="button"><?php echo $this->button_labels['add']; ?></button>
+			</div>
+         <style>
+            /* ==========================================================================
+   可排序中继器
+   ========================================================================== */
+.sortable {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.sortable input[type="text"] {
+	margin: 5px 5px 5px 0;
+	width: 80%;
+}
+
+.sortable div {
+	cursor: move;
+}
+
+.customize-control-sortable-repeater-delete {
+	color: #d4d4d4;
+}
+
+.customize-control-sortable-repeater-delete:hover {
+	color: #f00;
+}
+
+.customize-control-sortable-repeater-delete .dashicons-no-alt {
+	text-decoration: none;
+	margin: 8px 0 0 0;
+	font-weight: 600;
+}
+
+.customize-control-sortable-repeater-delete:active,
+.customize-control-sortable-repeater-delete:focus {
+	outline: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.repeater .dashicons-sort {
+	margin: 8px 5px 0 5px;
+	color: #d4d4d4;
+}
+
+.repeater .dashicons-sort:hover {
+	color: #a7a7a7;
+}
+            </style>
+            <script>
+ 
+
+               <script>
+		<?php
+		}
+	}
+
+
+
+
+    		// 为社交媒体URL添加我们的可排序中继器设置和自定义控件
+		$wp_customize->add_setting( 'sample_sortable_repeater_control_c',
+      array(
+         'default' => '',
+         'transport' => 'refresh',
+         'sanitize_callback' => 'skyrocket_url_sanitization_a'
+      )
+   );
+   $wp_customize->add_control( new Skyrocket_Sortable_Repeater_Custom_Control_c( $wp_customize, 'sample_sortable_repeater_control_c',
+      array(
+         'label' => __( '可排序中继器', 'skyrocket' ),
+         'description' => esc_html__( '这是控制说明.', 'skyrocket' ),
+         'section' => 'section_pro',
+         'button_labels' => array(
+            'add' => __( 'Add Row', 'skyrocket' ),
+         )
+      )
+   ) );
+
+
+   /**
+    * WP_Customize_Control
+	*		wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
+	*		wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+
+   */
+
 //添加控件
 $wp_customize->add_setting( 'demo_default_text',
    array(

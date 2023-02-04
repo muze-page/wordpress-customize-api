@@ -2,23 +2,113 @@
 //自定义控件
 
 //注册一个菜单
+
 function api_separator( $wp_customize ) {
     // Add all your Customizer content ( i.e. Panels, Sections, Settings & Controls ) here...
     //在此处添加所有自定义器内容（即面板、节、设置和控件）。。。
 
     //添加面板
 
-
-//添加部分
-/**
- * Add our Sample Section
- */
-$wp_customize->add_section( 'separator_section',
-   array(
-      'title' => __( '控件 - 自定义' ),
-      'description' => esc_html__( '以下是自定义控件的示例。' ),
-   )
+    //添加部分
+    /**
+    * Add our Sample Section
+    */
+    $wp_customize->add_section( 'separator_section',
+    array(
+        'title' => __( '控件 - 自定义' ),
+        'description' => esc_html__( '以下是自定义控件的示例。' ),
+    )
 );
+
+//基础类
+
+
+
+//布局选择控件-优化版
+class Skyrocket_Image_Radio_Button_Custom_Control_b extends WP_Customize_Control {
+    /**
+     * The type of control being rendered
+     */
+    public $type = 'image_radio_button_a';
+    /**
+     * Enqueue our scripts and styles
+     */
+    public function enqueue() {
+        //加载控件所需样式
+       // wp_enqueue_style( 'skyrocket-custom-controls-css', plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+    }
+    /**
+     * Render the control in the customizer
+     */
+    public function render_content() {
+    ?>
+        <div class="image_radio_button_control">
+            <?php if( !empty( $this->label ) ) { ?>
+                <span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+            <?php } ?>
+            <?php if( !empty( $this->description ) ) { ?>
+                <span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
+            <?php } ?>
+
+            <?php foreach ( $this->choices as $key => $value ) { ?>
+                <label class="radio-button-label">
+                    <input type="radio" name="<?php echo esc_attr( $this->id ); ?>" value="<?php echo esc_attr( $key ); ?>" <?php $this->link(); ?> <?php checked( esc_attr( $key ), $this->value() ); ?>/>
+                    <img src="<?php echo esc_attr( $value['image'] ); ?>" alt="<?php echo esc_attr( $value['name'] ); ?>" title="<?php echo esc_attr( $value['name'] ); ?>" />
+                </label>
+            <?php	} ?>
+        </div>
+        <style>
+            /*控件所需样式*/
+            /* ==========================================================================
+   Image Radio Buttons
+   ========================================================================== */
+.image_radio_button_control .radio-button-label > input {
+	display: none;
+}
+
+.image_radio_button_control .radio-button-label > img {
+	cursor: pointer;
+	border: 3px solid #ddd;
+}
+
+.image_radio_button_control .radio-button-label > input:checked + img {
+	border: 3px solid #2885bb;
+}
+            </style>
+    <?php
+    }
+}
+
+$wp_customize->add_setting( 'sample_image_radio_button_a',
+array(
+    //'default' => $this->defaults['sample_image_radio_button_a'],
+    'transport' => 'refresh',
+    'sanitize_callback' => 'skyrocket_radio_sanitization'
+)
+);
+$wp_customize->add_control( new Skyrocket_Image_Radio_Button_Custom_Control_b( $wp_customize, 'sample_image_radio_button_a',
+array(
+    'label' => __( 'Image Radio Button Control-9920', 'skyrocket' ),
+    'description' => esc_html__( 'Sample custom control description', 'skyrocket' ),
+    'section' => 'separator_section',
+    'choices' => array(
+        'sidebarleft' => array(
+            'image' => plugin_dir_url( __DIR__ ) . 'public/images/sidebar-left.png',
+            'name' => __( 'Left Sidebar', 'skyrocket' )
+        ),
+        'sidebarnone' => array(
+            'image' => plugin_dir_url( __DIR__ ) . 'public/images/sidebar-none.png',
+            'name' => __( 'No Sidebar', 'skyrocket' )
+        ),
+        'sidebarright' => array(
+            'image' => plugin_dir_url( __DIR__ ) . 'public/images/sidebar-right.png',
+            'name' => __( 'Right Sidebar', 'skyrocket' )
+        )
+    )
+)
+) );
+
+
 
 //布局选择控件
 if ( ! class_exists( 'WP_Customize_Control' ) )
@@ -88,7 +178,7 @@ if( class_exists( 'WP_Customize_Control' ) ):
 					<?php 
 					while( $latest->have_posts() ) {
 						$latest->the_post();
-						echo "<option " . selected( $this->value(), get_the_ID() ) . " value='" . get_the_ID() . "'>" . the_title( '', '', false ) . "</option>";
+						echo "<option " . selected( $this->value(), get_the_ID() ) . " value='' . get_the_ID() . ''>" . the_title( '', '', false ) . "</option>";
 					}
 					?>
 				</select>
@@ -269,53 +359,48 @@ $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'cove
      $rjs_choices_list_number[$rjs_single_cat->slug] = esc_html__( "{$rjs_category_name} ({$rjs_category_post_count})", 'text-domain' );
   
      //Note: don't forget the double quotes when concatenating the name, otherwise it will not work.
- }
+        }
 
-     //Register the setting
-     $wp_customize->add_setting( 'rjs_category_dropdown_number', array(
-         'type'       => 'theme_mod',
-         'capability' => 'edit_theme_options',
-         'default' => 'uncategorized',
-     ) );
- 
-     //Register the control
-     $wp_customize->add_control( 'rjs_category_dropdown_number', array(
-         'type' => 'select',
-         'section' => 'separator_section',
-         'label' => __( '包含帖子数的分类下拉列表' ),
-         'description' => __( 'Description.' ),
-         'choices' => $rjs_choices_list_number, //Add the list with options
-     ) );
+        //Register the setting
+        $wp_customize->add_setting( 'rjs_category_dropdown_number', array(
+            'type'       => 'theme_mod',
+            'capability' => 'edit_theme_options',
+            'default' => 'uncategorized',
+        ) );
 
+        //Register the control
+        $wp_customize->add_control( 'rjs_category_dropdown_number', array(
+            'type' => 'select',
+            'section' => 'separator_section',
+            'label' => __( '包含帖子数的分类下拉列表' ),
+            'description' => __( 'Description.' ),
+            'choices' => $rjs_choices_list_number, //Add the list with options
+        ) );
 
-     //单选按钮
-             //Register the setting
-             $wp_customize->add_setting( 'rjs_category_dropdown_radio', array(
-                 'type'       => 'theme_mod',
-                 'capability' => 'edit_theme_options',
-                 'default' => 'uncategorized',
-             ) );
-         
-             //Register the control
-             $wp_customize->add_control( 'rjs_category_dropdown_radio', array(
-                 'type' => 'radio',
-                 'section' => 'separator_section',
-                 'label' => __( '包含帖子数的分类下拉列表' ),
-                 'description' => __( 'Description.' ),
-                 'choices' => $rjs_choices_list_number, //Add the list with options
-             ) );
+        //单选按钮
+        //Register the setting
+        $wp_customize->add_setting( 'rjs_category_dropdown_radio', array(
+            'type'       => 'theme_mod',
+            'capability' => 'edit_theme_options',
+            'default' => 'uncategorized',
+        ) );
 
+        //Register the control
+        $wp_customize->add_control( 'rjs_category_dropdown_radio', array(
+            'type' => 'radio',
+            'section' => 'separator_section',
+            'label' => __( '包含帖子数的分类下拉列表' ),
+            'description' => __( 'Description.' ),
+            'choices' => $rjs_choices_list_number, //Add the list with options
+        ) );
 
+        //自定义控件
+        //https://developer.wordpress.org/themes/customize-api/customizer-objects/#custom-controls-sections-and-panels
 
-
-
-
- //自定义控件
- //https://developer.wordpress.org/themes/customize-api/customizer-objects/#custom-controls-sections-and-panels
- class WP_New_Menu_Customize_Control extends WP_Customize_Control {
-   public $type = 'new_menu';
-   /**
-   * Render the control's content.
+        class WP_New_Menu_Customize_Control extends WP_Customize_Control {
+            public $type = 'new_menu';
+            /**
+            * Render the control's content.
    */
    public function render_content() {
    ?>
@@ -355,8 +440,4 @@ $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'cove
 ;
 add_action( 'customize_register', 'api_separator' );
 
-
-
-
-
-?>
+            ?>

@@ -22,7 +22,7 @@ require_once dirname( __FILE__ ) . '/options/demo.php' ;
 //测试控件
 //require_once dirname( __FILE__ ) . '/test.php' ;
 
-add_action( 'wp_head', 'test_tops' );
+//add_action( 'wp_head', 'test_tops' );
 
 function test_tops() {
 

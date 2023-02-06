@@ -2760,29 +2760,309 @@ array(
 		)
 	) );
 
+
+	//下拉帖子部件
+
+		/**
+	 * Dropdown Posts Custom Control
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+	class Skyrocket_Dropdown_Posts_Custom_Control_a extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'dropdown_posts';
+		/**
+		 * Posts
+		 */
+		private $posts = array();
+		/**
+		 * Constructor
+		 */
+		public function __construct( $manager, $id, $args = array(), $options = array() ) {
+			parent::__construct( $manager, $id, $args );
+			// Get our Posts
+			$this->posts = get_posts( $this->input_attrs );
+		}
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content() {
+		?>
+			<div class="dropdown_posts_control">
+				<?php if( !empty( $this->label ) ) { ?>
+					<label for="<?php echo esc_attr( $this->id ); ?>" class="customize-control-title">
+						<?php echo esc_html( $this->label ); ?>
+					</label>
+				<?php } ?>
+				<?php if( !empty( $this->description ) ) { ?>
+					<span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
+				<?php } ?>
+				<select name="<?php echo $this->id; ?>" id="<?php echo $this->id; ?>" <?php $this->link(); ?>>
+					<?php
+						if( !empty( $this->posts ) ) {
+							foreach ( $this->posts as $post ) {
+								printf( '<option value="%s" %s>%s</option>',
+									$post->ID,
+									selected( $this->value(), $post->ID, false ),
+									$post->post_title
+								);
+							}
+						}
+					?>
+				</select>
+			</div>
+		<?php
+		}
+	}
+
+			// 下拉帖子测试
+			$wp_customize->add_setting( 'sample_dropdown_posts_control_a',
+			array(
+				'default' =>'',
+				'transport' => 'postMessage',
+				'sanitize_callback' => 'absint'
+			)
+		);
+		$wp_customize->add_control( new Skyrocket_Dropdown_Posts_Custom_Control_a( $wp_customize, 'sample_dropdown_posts_control_a',
+			array(
+				'label' => __( '下拉帖子测试', 'skyrocket' ),
+				'description' => esc_html__( '简单的描述', 'skyrocket' ),
+				'section' => 'section_pro',
+				'input_attrs' => array(
+					'posts_per_page' => -1,
+					'orderby' => 'name',
+					'order' => 'ASC',
+				),
+			)
+		) );
+
+//TinyMCE编辑器控件
+
+
+
+	/**
+	 * TinyMCE Custom Control
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+	class Skyrocket_TinyMCE_Custom_control_a extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'tinymce_editor_a';
+		/**
+		 * Enqueue our scripts and styles
+		 */
+		public function enqueue(){
+			//wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
+			//wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+			wp_enqueue_editor();
+		}
+		/**
+		 * Pass our TinyMCE toolbar string to JavaScript
+		 */
+		public function to_json() {
+			parent::to_json();
+			$this->json['skyrockettinymcetoolbar1'] = isset( $this->input_attrs['toolbar1'] ) ? esc_attr( $this->input_attrs['toolbar1'] ) : 'bold italic bullist numlist alignleft aligncenter alignright link';
+			$this->json['skyrockettinymcetoolbar2'] = isset( $this->input_attrs['toolbar2'] ) ? esc_attr( $this->input_attrs['toolbar2'] ) : '';
+			$this->json['skyrocketmediabuttons'] = isset( $this->input_attrs['mediaButtons'] ) && ( $this->input_attrs['mediaButtons'] === true ) ? true : false;
+		}
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content(){
+		?>
+			<div class="tinymce-control">
+				<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+				<?php if( !empty( $this->description ) ) { ?>
+					<span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
+				<?php } ?>
+				<textarea id="<?php echo esc_attr( $this->id ); ?>" class="customize-control-tinymce-editor" <?php $this->link(); ?>><?php echo esc_attr( $this->value() ); ?></textarea>
+			</div>
+			<style>
+				</style>
+				<script>
+					jQuery( document ).ready(function($) {
+	"use strict";
+						/**
+	 * TinyMCE自定义控件
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+
+	$('.customize-control-tinymce-editor').each(function(){
+		// Get the toolbar strings that were passed from the PHP Class
+		var tinyMCEToolbar1String = _wpCustomizeSettings.controls[$(this).attr('id')].skyrockettinymcetoolbar1;
+		var tinyMCEToolbar2String = _wpCustomizeSettings.controls[$(this).attr('id')].skyrockettinymcetoolbar2;
+		var tinyMCEMediaButtons = _wpCustomizeSettings.controls[$(this).attr('id')].skyrocketmediabuttons;
+
+		wp.editor.initialize( $(this).attr('id'), {
+			tinymce: {
+				wpautop: true,
+				toolbar1: tinyMCEToolbar1String,
+				toolbar2: tinyMCEToolbar2String
+			},
+			quicktags: true,
+			mediaButtons: tinyMCEMediaButtons
+		});
+	});
+	$(document).on( 'tinymce-editor-init', function( event, editor ) {
+		editor.on('change', function(e) {
+			tinyMCE.triggerSave();
+			$('#'+editor.id).trigger('change');
+		});
+	});
+
+});
+					</script>
+		<?php
+		}
+	}
+
+
+		// TinyMCE控制测试
+		$wp_customize->add_setting( 'sample_tinymce_editor_a',
+			array(
+				'default' => '',
+				'transport' => 'postMessage',
+				'sanitize_callback' => 'wp_kses_post'
+			)
+		);
+		$wp_customize->add_control( new Skyrocket_TinyMCE_Custom_control_a( $wp_customize, 'sample_tinymce_editor_a',
+			array(
+				'label' => __( 'TinyMCE 控件', 'skyrocket' ),
+				'description' => __( '这是TinyMCE编辑器自定义控件', 'skyrocket' ),
+				'section' => 'section_pro',
+				'input_attrs' => array(
+					'toolbar1' => 'bold italic bullist numlist alignleft aligncenter alignright link',
+					'mediaButtons' => true,
+				)
+			)
+		) );
+		$wp_customize->selective_refresh->add_partial( 'sample_tinymce_editor_a',
+			array(
+				'selector' => '.footer-credits',
+				'container_inclusive' => false,
+				'render_callback' => 'skyrocket_get_credits_render_callback_a',
+				'fallback_refresh' => false,
+			)
+		);
+
+		/**
+ * 呈现用于显示页脚信用的回调
+ */
+function skyrocket_get_credits_render_callback_a() {
+	echo skyrocket_get_credits_a();
+}
+
+/**
+ * 返回包含TinyMCE控件示例的字符串
+*这是一个示例函数，说明如何在主题中使用TinyMCE控件进行页脚积分
+*将以下三行代码添加到footer.php文件中，以显示示例TinyMCE控件的内容
+ * <div class="footer-credits">
+ *		<?php echo skyrocket_get_credits(); ?>
+ *	</div>
+ */
+if ( ! function_exists( 'skyrocket_get_credits_a' ) ) {
+	function skyrocket_get_credits_a() {
+		//调用默认值
+		//$defaults = skyrocket_generate_defaults_a();
+
+		// wpautop此控件，使其像新的可视化文本小部件一样，因为我们使用的是相同的TinyMCE控件
+		//return wpautop( get_theme_mod( 'sample_tinymce_editor', $defaults['sample_tinymce_editor'] ) );
+		return wpautop( get_theme_mod( 'sample_tinymce_editor', '' ) );
+	}
+}
+
+
+//追加销售部分部件
+	/**
+	 * Upsell section
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 *
+	 */
+	class Skyrocket_Upsell_Section_a extends WP_Customize_Section {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'skyrocket-upsell_a';
+		/**
+		 * The Upsell URL
+		 */
+		public $url = '';
+		/**
+		 * The background color for the control
+		 */
+		public $backgroundcolor = '';
+		/**
+		 * The text color for the control
+		 */
+		public $textcolor = '';
+		/**
+		 * Enqueue our scripts and styles
+		 */
+		public function enqueue() {
+			//wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
+			//wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+		}
+		/**
+		 * Render the section, and the controls that have been added to it.
+		 */
+		protected function render() {
+			$bkgrndcolor = !empty( $this->backgroundcolor ) ? esc_attr( $this->backgroundcolor ) : '#fff';
+			$color = !empty( $this->textcolor ) ? esc_attr( $this->textcolor ) : '#555d66';
+			?>
+			<li id="accordion-section-<?php echo esc_attr( $this->id ); ?>" class="skyrocket_upsell_section accordion-section control-section control-section-<?php echo esc_attr( $this->id ); ?> cannot-expand">
+				<h3 class="upsell-section-title" <?php echo ' style="color:' . $color . ';border-left-color:' . $bkgrndcolor .';border-right-color:' . $bkgrndcolor .';"'; ?>>
+					<a href="<?php echo esc_url( $this->url); ?>" target="_blank"<?php echo ' style="background-color:' . $bkgrndcolor . ';color:' . $color .';"'; ?>><?php echo esc_html( $this->title ); ?></a>
+				</h3>
+			</li>
+			
+			<?php
+		}
+	}
+
+
+		/**
+		 * 添加我们的追加销售部分
+		 */
+		$wp_customize->add_section( new Skyrocket_Upsell_Section_a( $wp_customize, 'upsell_section',
+			array(
+				'title' => __( '销售推荐', 'skyrocket' ),
+				'url' => 'https://skyrocketthemes.com',
+				'backgroundcolor' => '#344860',
+				'textcolor' => '#fff',
+				'priority' => 199,
+			)
+		) );
+
+
+
+
+
+
+	
+
+
    /**
     * WP_Customize_Control
 	*		wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
 	*		wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
-
+    * 'section' => 'section_pro',
    */
 
-//添加控件
-$wp_customize->add_setting( 'demo_default_text',
-   array(
-      'default' => '',
-      'transport' => 'refresh',
-   )
-);
- 
-$wp_customize->add_control( 'demo_default_text',
-   array(
-      'label' => __( '默认文本控件' ),
-      'description' => esc_html__( '文本控件类型可以是文本、电子邮件、url、数字、隐藏或日期' ),
-      'section' => 'section_pro',
-      'type' => 'text', // Can be either text, email, url, number, hidden, or date
-   )
-);
+
 
 }
 ;

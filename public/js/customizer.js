@@ -465,7 +465,7 @@ jQuery( document ).ready(function($) {
 			animate: 300
 		};
 
-		// Initialize jQuery UI slider with our options.
+		// 使用我们的选项初始化jQuery UI滑块。
 		$alphaSlider.slider( sliderOptions );
 
 		// Maybe show the opacity on the handle.

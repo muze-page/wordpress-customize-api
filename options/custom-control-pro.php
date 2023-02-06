@@ -2142,6 +2142,624 @@ array(
       )
    ) );
 
+
+//可排序药丸复选框自定义控件
+	/**
+	 * 文本净化
+	 *
+	 * @param  string	要清理的输入（包含单个字符串或多个字符串，用逗号分隔）
+	 * @return string	Sanitized input
+	 */
+	if ( ! function_exists( 'skyrocket_text_sanitization_w' ) ) {
+		function skyrocket_text_sanitization_w( $input ) {
+			if ( strpos( $input, ',' ) !== false) {
+				$input = explode( ',', $input );
+			}
+			if( is_array( $input ) ) {
+				foreach ( $input as $key => $value ) {
+					$input[$key] = sanitize_text_field( $value );
+				}
+				$input = implode( ',', $input );
+			}
+			else {
+				$input = sanitize_text_field( $input );
+			}
+			return $input;
+		}
+	}
+
+		/**
+	 * 可排序药丸复选框自定义控件
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+	class Skyrocket_Pill_Checkbox_Custom_Control_w extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'pill_checkbox_w';
+		/**
+		 * Define whether the pills can be sorted using drag 'n drop. Either false or true. Default = false
+		 */
+		private $sortable = false;
+		/**
+		 * The width of the pills. Each pill can be auto width or full width. Default = false
+		 */
+		private $fullwidth = false;
+		/**
+		 * Constructor
+		 */
+		public function __construct( $manager, $id, $args = array(), $options = array() ) {
+			parent::__construct( $manager, $id, $args );
+			// Check if these pills are sortable
+			if ( isset( $this->input_attrs['sortable'] ) && $this->input_attrs['sortable'] ) {
+				$this->sortable = true;
+			}
+			// Check if the pills should be full width
+			if ( isset( $this->input_attrs['fullwidth'] ) && $this->input_attrs['fullwidth'] ) {
+				$this->fullwidth = true;
+			}
+		}		/**
+		 * Enqueue our scripts and styles
+		 */
+		public function enqueue() {
+			//wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );
+			//wp_enqueue_style( 'skyrocket-custom-controls-css',  plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.0', 'all' );
+		}
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content() {
+			$reordered_choices = array();
+			$saved_choices = explode( ',', esc_attr( $this->value() ) );
+
+			// Order the checkbox choices based on the saved order
+			if( $this->sortable ) {
+				foreach ( $saved_choices as $key => $value ) {
+					if( isset( $this->choices[$value] ) ) {
+						$reordered_choices[$value] = $this->choices[$value];
+					}
+				}
+				$reordered_choices = array_merge( $reordered_choices, array_diff_assoc( $this->choices, $reordered_choices ) );
+			}
+			else {
+				$reordered_choices = $this->choices;
+			}
+		?>
+			<div class="pill_checkbox_control">
+				<?php if( !empty( $this->label ) ) { ?>
+					<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+				<?php } ?>
+				<?php if( !empty( $this->description ) ) { ?>
+					<span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
+				<?php } ?>
+				<input type="hidden" id="<?php echo esc_attr( $this->id ); ?>" name="<?php echo esc_attr( $this->id ); ?>" value="<?php echo esc_attr( $this->value() ); ?>" class="customize-control-sortable-pill-checkbox" <?php $this->link(); ?> />
+				<div class="sortable_pills<?php echo ( $this->sortable ? ' sortable' : '' ) . ( $this->fullwidth ? ' fullwidth_pills' : '' ); ?>">
+				<?php foreach ( $reordered_choices as $key => $value ) { ?>
+					<label class="checkbox-label">
+						<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $key ); ?>" <?php checked( in_array( esc_attr( $key ), $saved_choices, true ), true ); ?> class="sortable-pill-checkbox"/>
+						<span class="sortable-pill-title"><?php echo esc_attr( $value ); ?></span>
+						<?php if( $this->sortable && $this->fullwidth ) { ?>
+							<span class="dashicons dashicons-sort"></span>
+						<?php } ?>
+					</label>
+				<?php	} ?>
+				</div>
+			</div>
+			<style>
+				/* ==========================================================================
+   Pill Checkboxes
+   ========================================================================== */
+.pill_checkbox_control .checkbox-label > input {
+	display: none;
+}
+
+.pill_checkbox_control .checkbox-label > .sortable-pill-title {
+	box-sizing: border-box;
+	cursor: pointer;
+	background-color: #ddd;
+	padding: 5px 15px;
+	border-radius: 20px;
+	font-size: 1rem;
+	display: inline-block;
+	margin-bottom: 5px
+}
+
+.pill_checkbox_control .sortable .checkbox-label > .sortable-pill-title {
+	cursor: move;
+}
+
+.pill_checkbox_control .sortable.fullwidth_pills .checkbox-label > .sortable-pill-title {
+	cursor: pointer;
+}
+
+.pill_checkbox_control .checkbox-label > input:checked + .sortable-pill-title { 
+	background-color: #2084bd;
+	color: #fff;
+}
+
+.pill_checkbox_control .checkbox-label > input:checked + .sortable-pill-title:before { 
+	display: inline-block;
+	font-style: normal;
+	font-variant: normal;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	font-family: "dashicons";
+	font-weight: normal;
+	font-size: 24px;
+	content: "\f147";
+	margin-left: -10px;
+	vertical-align: bottom;
+}
+
+.pill_checkbox_control .fullwidth_pills .checkbox-label > .sortable-pill-title {
+	width: 100%;
+	border-radius: 0;
+}
+
+.pill_checkbox_control .sortable.fullwidth_pills .checkbox-label > .sortable-pill-title {
+	width: 90%;
+}
+
+.pill-ui-state-highlight {
+	display: inline-block;
+	padding: 5px 15px;
+	border-radius: 20px;
+	font-size: 1rem;
+	border: 1px dotted #2084bd;
+	margin-bottom: 5px;
+	height: 16px;
+}
+
+.pill_checkbox_control .sortable_pills .pill-ui-state-highlight {
+	width: 50px;
+	border-radius: 20px;
+}
+
+.pill_checkbox_control .sortable_pills.fullwidth_pills .pill-ui-state-highlight {
+	width: 90%;
+	border-radius: 0;
+}
+
+.pill_checkbox_control .dashicons-sort {
+	margin: 5px 0 0 1px;
+	color: #d4d4d4;
+	cursor: move;
+}
+
+.pill_checkbox_control .dashicons-sort:hover {
+	color: #a7a7a7;
+}
+
+.pill_checkbox_control .sortable_pills.fullwidth_pills .ui-sortable-helper {
+	width: calc(100% - 25px) !important;
+}
+			</style>
+			
+			<script>
+				jQuery( document ).ready(function($) {
+	"use strict";
+	/**
+	 * 药丸复选框自定义控件
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+
+	 $( ".pill_checkbox_control .sortable" ).sortable({
+		placeholder: "pill-ui-state-highlight",
+		update: function( event, ui ) {
+			skyrocketGetAllPillCheckboxes($(this).parent());
+		}
+	});
+
+	$('.pill_checkbox_control .sortable-pill-checkbox').on('change', function () {
+		skyrocketGetAllPillCheckboxes($(this).parent().parent().parent());
+	});
+
+	// 从复选框中获取值并添加到隐藏字段
+	function skyrocketGetAllPillCheckboxes($element) {
+		var inputValues = $element.find('.sortable-pill-checkbox').map(function() {
+			if( $(this).is(':checked') ) {
+				return $(this).val();
+			}
+		}).toArray();
+		$element.find('.customize-control-sortable-pill-checkbox').val(inputValues).trigger('change');
+	}
+});
+			</script>
+
+		<?php
+		}
+	}
+
+   		// 药丸复选框自定义控件测试
+		$wp_customize->add_setting( 'sample_pill_checkbox_w',
+		array(
+			'default' => 'tiger,elephant,hippo',
+			'transport' => 'refresh',
+			'sanitize_callback' => 'skyrocket_text_sanitization_w'
+		)
+	);
+	$wp_customize->add_control( new Skyrocket_Pill_Checkbox_Custom_Control_w( $wp_customize, 'sample_pill_checkbox_w',
+		array(
+			'label' => __( '药丸复选框控件', 'skyrocket' ),
+			'description' => esc_html__( '这是药丸复选框控件示例', 'skyrocket' ),
+			'section' => 'section_pro',
+			'input_attrs' => array(
+				'sortable' => false,
+				'fullwidth' => false,
+			),
+			'choices' => array(
+				'tiger' => __( 'Tiger', 'skyrocket' ),
+				'lion' => __( 'Lion', 'skyrocket' ),
+				'giraffe' => __( 'Giraffe', 'skyrocket'  ),
+				'elephant' => __( 'Elephant', 'skyrocket'  ),
+				'hippo' => __( 'Hippo', 'skyrocket'  ),
+				'rhino' => __( 'Rhino', 'skyrocket'  ),
+			)
+		)
+	) );
+
+
+			// 可排序
+			$wp_customize->add_setting( 'sample_pill_checkbox2_b',
+			array(
+				'default' => 'captainmarvel,msmarvel,squirrelgirl',
+				'transport' => 'refresh',
+				'sanitize_callback' => 'skyrocket_text_sanitization_w'
+			)
+		);
+		$wp_customize->add_control( new Skyrocket_Pill_Checkbox_Custom_Control_w( $wp_customize, 'sample_pill_checkbox2_b',
+			array(
+				'label' => __( '药丸复选框控件', 'skyrocket' ),
+				'description' => esc_html__( '这是一个示例可排序药丸复选框控件', 'skyrocket' ),
+				'section' => 'section_pro',
+				'input_attrs' => array(
+					'sortable' => true,
+					'fullwidth' => false,
+				),
+				'choices' => array(
+					'captainamerica' => __( 'Captain America', 'skyrocket' ),
+					'ironman' => __( 'Iron Man', 'skyrocket' ),
+					'captainmarvel' => __( 'Captain Marvel', 'skyrocket'  ),
+					'msmarvel' => __( 'Ms. Marvel', 'skyrocket'  ),
+					'Jessicajones' => __( 'Jessica Jones', 'skyrocket'  ),
+					'squirrelgirl' => __( 'Squirrel Girl', 'skyrocket'  ),
+					'blackwidow' => __( 'Black Widow', 'skyrocket'  ),
+					'hulk' => __( 'Hulk', 'skyrocket'  ),
+				)
+			)
+		) );
+
+		//全宽 - 可排序
+		$wp_customize->add_setting( 'sample_pill_checkbox3_c',
+			array(
+				'default' => 'author,categories,comments',
+				'transport' => 'refresh',
+				'sanitize_callback' => 'skyrocket_text_sanitization_w'
+			)
+		);
+		$wp_customize->add_control( new Skyrocket_Pill_Checkbox_Custom_Control_w( $wp_customize, 'sample_pill_checkbox3_c',
+			array(
+				'label' => __( '药丸复选框控件', 'skyrocket' ),
+				'description' => esc_html__( '这是一个示例Sortable Fullwidth Pill复选框控件', 'skyrocket' ),
+				'section' => 'section_pro',
+				'input_attrs' => array(
+					'sortable' => true,
+					'fullwidth' => true,
+				),
+				'choices' => array(
+					'date' => __( 'Date', 'skyrocket' ),
+					'author' => __( 'Author', 'skyrocket' ),
+					'categories' => __( 'Categories', 'skyrocket'  ),
+					'tags' => __( 'Tags', 'skyrocket'  ),
+					'comments' => __( 'Comments', 'skyrocket'  ),
+				)
+			)
+		) );
+
+
+
+		//下拉选择框控件
+
+			/**
+	 * 文本净化
+	 *
+	 * @param  string	要清理的输入（包含单个字符串或多个字符串，用逗号分隔）
+	 * @return string	Sanitized input
+	 */
+	if ( ! function_exists( 'skyrocket_text_sanitization_t' ) ) {
+		function skyrocket_text_sanitization_t( $input ) {
+			if ( strpos( $input, ',' ) !== false) {
+				$input = explode( ',', $input );
+			}
+			if( is_array( $input ) ) {
+				foreach ( $input as $key => $value ) {
+					$input[$key] = sanitize_text_field( $value );
+				}
+				$input = implode( ',', $input );
+			}
+			else {
+				$input = sanitize_text_field( $input );
+			}
+			return $input;
+		}
+	}
+
+
+	/**
+	 * 下拉选择2自定义控件
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+	class Skyrocket_Dropdown_Select2_Custom_Control_t extends WP_Customize_Control {
+		/**
+		 * The type of control being rendered
+		 */
+		public $type = 'dropdown_select2_t';
+		/**
+		 * The type of Select2 Dropwdown to display. Can be either a single select dropdown or a multi-select dropdown. Either false for true. Default = false
+		 */
+		private $multiselect = false;
+		/**
+		 * The Placeholder value to display. Select2 requires a Placeholder value to be set when using the clearall option. Default = 'Please select...'
+		 */
+		private $placeholder = 'Please select...';
+		/**
+		 * Constructor
+		 */
+		public function __construct( $manager, $id, $args = array(), $options = array() ) {
+			parent::__construct( $manager, $id, $args );
+			// Check if this is a multi-select field
+			if ( isset( $this->input_attrs['multiselect'] ) && $this->input_attrs['multiselect'] ) {
+				$this->multiselect = true;
+			}
+			// Check if a placeholder string has been specified
+			if ( isset( $this->input_attrs['placeholder'] ) && $this->input_attrs['placeholder'] ) {
+				$this->placeholder = $this->input_attrs['placeholder'];
+			}
+		}
+		/**
+		 * Enqueue our scripts and styles
+		 */
+		public function enqueue() {
+			wp_enqueue_script( 'skyrocket-select2-js',  plugin_dir_url( __DIR__ )  . 'public/js/select2.full.min.js', array( 'jquery' ), '4.0.13', true );
+			//wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'skyrocket-select2-js' ), '1.0', true );
+			wp_enqueue_style( 'skyrocket-custom-controls-css', plugin_dir_url( __DIR__ )  . 'public/css/customizer.css', array(), '1.1', 'all' );
+			wp_enqueue_style( 'skyrocket-select2-css',  plugin_dir_url( __DIR__ )  . 'public/css/select2.min.css', array(), '4.0.13', 'all' );
+		}
+		/**
+		 * Render the control in the customizer
+		 */
+		public function render_content() {
+			$defaultValue = $this->value();
+			if ( $this->multiselect ) {
+				$defaultValue = explode( ',', $this->value() );
+			}
+		?>
+			<div class="dropdown_select2_control">
+				<?php if( !empty( $this->label ) ) { ?>
+					<label for="<?php echo esc_attr( $this->id ); ?>" class="customize-control-title">
+						<?php echo esc_html( $this->label ); ?>
+					</label>
+				<?php } ?>
+				<?php if( !empty( $this->description ) ) { ?>
+					<span class="customize-control-description"><?php echo esc_html( $this->description ); ?></span>
+				<?php } ?>
+				<input type="hidden" id="<?php echo esc_attr( $this->id ); ?>" class="customize-control-dropdown-select2" value="<?php echo esc_attr( $this->value() ); ?>" name="<?php echo esc_attr( $this->id ); ?>" <?php $this->link(); ?> />
+				<select name="select2-list-<?php echo ( $this->multiselect ? 'multi[]' : 'single' ); ?>" class="customize-control-select2" data-placeholder="<?php echo $this->placeholder; ?>" <?php echo ( $this->multiselect ? 'multiple="multiple" ' : '' ); ?>>
+					<?php
+						if ( !$this->multiselect ) {
+							// When using Select2 for single selection, the Placeholder needs an empty <option> at the top of the list for it to work (multi-selects dont need this)
+							echo '<option></option>';
+						}
+						foreach ( $this->choices as $key => $value ) {
+							if ( is_array( $value ) ) {
+								echo '<optgroup label="' . esc_attr( $key ) . '">';
+								foreach ( $value as $optgroupkey => $optgroupvalue ) {
+									if( $this->multiselect ){
+										echo '<option value="' . esc_attr( $optgroupkey ) . '" ' . ( in_array( esc_attr( $optgroupkey ), $defaultValue ) ? 'selected="selected"' : '' ) . '>' . esc_attr( $optgroupvalue ) . '</option>';
+									}
+									else{
+										echo '<option value="' . esc_attr( $optgroupkey ) . '" ' . selected( esc_attr( $optgroupkey ), $defaultValue, false )  . '>' . esc_attr( $optgroupvalue ) . '</option>';
+									}
+								}
+								echo '</optgroup>';
+							}
+							else {
+								if( $this->multiselect ){
+									echo '<option value="' . esc_attr( $key ) . '" ' . ( in_array( esc_attr( $key ), $defaultValue ) ? 'selected="selected"' : '' ) . '>' . esc_attr( $value ) . '</option>';
+								}
+								else{
+									echo '<option value="' . esc_attr( $key ) . '" ' . selected( esc_attr( $key ), $defaultValue, false )  . '>' . esc_attr( $value ) . '</option>';
+								}
+							}
+						}
+					?>
+				</select>
+			</div>
+			<style>
+				</style>
+				<script>
+					jQuery( document ).ready(function($) {
+	"use strict";
+					/**
+	 * 下拉选择2自定义控件
+	 *
+	 * @author Anthony Hortin <http://maddisondesigns.com>
+	 * @license http://www.gnu.org/licenses/gpl-2.0.html
+	 * @link https://github.com/maddisondesigns
+	 */
+
+	$('.customize-control-dropdown-select2').each(function(){
+		$('.customize-control-select2').select2({
+			allowClear: true
+		});
+	});
+
+	$(".customize-control-select2").on("change", function() {
+		var select2Val = $(this).val();
+		$(this).parent().find('.customize-control-dropdown-select2').val(select2Val).trigger('change');
+	});
+
+});
+				</script>
+		<?php
+		}
+	}
+
+
+
+				//下拉选择2控件测试（单选）
+				$wp_customize->add_setting( 'sample_t',
+				array(
+					'default' => 'vic',
+					'transport' => 'refresh',
+					'sanitize_callback' => 'skyrocket_text_sanitization_t'
+				)
+			);
+			$wp_customize->add_control( new Skyrocket_Dropdown_Select2_Custom_Control_t( $wp_customize, 'sample_t',
+				array(
+					'label' => __( '下拉选择2控件', 'skyrocket' ),
+					'description' => esc_html__( '示例下拉选择2自定义控件（单选）', 'skyrocket' ),
+					'section' => 'section_pro',
+					'input_attrs' => array(
+						'placeholder' => __( 'Please select a state...', 'skyrocket' ),
+						'multiselect' => false,
+					),
+					'choices' => array(
+						'nsw' => __( 'New South Wales', 'skyrocket' ),
+						'vic' => __( 'Victoria', 'skyrocket' ),
+						'qld' => __( 'Queensland', 'skyrocket' ),
+						'wa' => __( 'Western Australia', 'skyrocket' ),
+						'sa' => __( 'South Australia', 'skyrocket' ),
+						'tas' => __( 'Tasmania', 'skyrocket' ),
+						'act' => __( 'Australian Capital Territory', 'skyrocket' ),
+						'nt' => __( 'Northern Territory', 'skyrocket' ),
+					)
+				)
+			) );
+
+					// 下拉选择2控件测试（多选）
+		$wp_customize->add_setting( 'sample_2_b',
+		array(
+			'default' => 'Antarctica/McMurdo,Australia/Melbourne,Australia/Broken_Hill',
+			'transport' => 'refresh',
+			'sanitize_callback' => 'skyrocket_text_sanitization_t'
+		)
+	);
+	$wp_customize->add_control( new Skyrocket_Dropdown_Select2_Custom_Control_t( $wp_customize, 'sample_2_b',
+		array(
+			'label' => __( '下拉选择2控件', 'skyrocket' ),
+			'description' => esc_html__( '示例下拉选择2自定义控件（多选）', 'skyrocket' ),
+			'section' => 'section_pro',
+			'input_attrs' => array(
+				'multiselect' => true,
+			),
+			'choices' => array(
+				__( 'Antarctica', 'skyrocket' ) => array(
+					'Antarctica/Casey' => __( 'Casey', 'skyrocket' ),
+					'Antarctica/Davis' => __( 'Davis', 'skyrocket' ),
+					'Antarctica/DumontDurville' => __( 'DumontDUrville', 'skyrocket' ),
+					'Antarctica/Macquarie' => __( 'Macquarie', 'skyrocket' ),
+					'Antarctica/Mawson' => __( 'Mawson', 'skyrocket' ),
+					'Antarctica/McMurdo' => __( 'McMurdo', 'skyrocket' ),
+					'Antarctica/Palmer' => __( 'Palmer', 'skyrocket' ),
+					'Antarctica/Rothera' => __( 'Rothera', 'skyrocket' ),
+					'Antarctica/Syowa' => __( 'Syowa', 'skyrocket' ),
+					'Antarctica/Troll' => __( 'Troll', 'skyrocket' ),
+					'Antarctica/Vostok' => __( 'Vostok', 'skyrocket' ),
+				),
+				__( 'Atlantic', 'skyrocket' ) => array(
+					'Atlantic/Azores' => __( 'Azores', 'skyrocket' ),
+					'Atlantic/Bermuda' => __( 'Bermuda', 'skyrocket' ),
+					'Atlantic/Canary' => __( 'Canary', 'skyrocket' ),
+					'Atlantic/Cape_Verde' => __( 'Cape Verde', 'skyrocket' ),
+					'Atlantic/Faroe' => __( 'Faroe', 'skyrocket' ),
+					'Atlantic/Madeira' => __( 'Madeira', 'skyrocket' ),
+					'Atlantic/Reykjavik' => __( 'Reykjavik', 'skyrocket' ),
+					'Atlantic/South_Georgia' => __( 'South Georgia', 'skyrocket' ),
+					'Atlantic/Stanley' => __( 'Stanley', 'skyrocket' ),
+					'Atlantic/St_Helena' => __( 'St Helena', 'skyrocket' ),
+				),
+				__( 'Australia', 'skyrocket' ) => array(
+					'Australia/Adelaide' => __( 'Adelaide', 'skyrocket' ),
+					'Australia/Brisbane' => __( 'Brisbane', 'skyrocket' ),
+					'Australia/Broken_Hill' => __( 'Broken Hill', 'skyrocket' ),
+					'Australia/Currie' => __( 'Currie', 'skyrocket' ),
+					'Australia/Darwin' => __( 'Darwin', 'skyrocket' ),
+					'Australia/Eucla' => __( 'Eucla', 'skyrocket' ),
+					'Australia/Hobart' => __( 'Hobart', 'skyrocket' ),
+					'Australia/Lindeman' => __( 'Lindeman', 'skyrocket' ),
+					'Australia/Lord_Howe' => __( 'Lord Howe', 'skyrocket' ),
+					'Australia/Melbourne' => __( 'Melbourne', 'skyrocket' ),
+					'Australia/Perth' => __( 'Perth', 'skyrocket' ),
+					'Australia/Sydney' => __( 'Sydney', 'skyrocket' ),
+				)
+			)
+		)
+	) );
+
+	// 使用单阵列选择测试下拉式Select2控件（多选）
+	$wp_customize->add_setting( 'sample_2_c',
+		array(
+			'default' => 'Atlantic/Stanley,Australia/Darwin',
+			'transport' => 'refresh',
+			'sanitize_callback' => 'skyrocket_text_sanitization_t'
+		)
+	);
+	$wp_customize->add_control( new Skyrocket_Dropdown_Select2_Custom_Control_t( $wp_customize, 'sample_2_c',
+		array(
+			'label' => __( '下拉选择2控件', 'skyrocket' ),
+			'description' => esc_html__( '另一个示例下拉选择2自定义控件（多选）', 'skyrocket' ),
+			'section' => 'section_pro',
+			'input_attrs' => array(
+				'multiselect' => true,
+			),
+			'choices' => array(
+				'Antarctica/Casey' => __( 'Casey', 'skyrocket' ),
+				'Antarctica/Davis' => __( 'Davis', 'skyrocket' ),
+				'Antarctica/DumontDurville' => __( 'DumontDUrville', 'skyrocket' ),
+				'Antarctica/Macquarie' => __( 'Macquarie', 'skyrocket' ),
+				'Antarctica/Mawson' => __( 'Mawson', 'skyrocket' ),
+				'Antarctica/McMurdo' => __( 'McMurdo', 'skyrocket' ),
+				'Antarctica/Palmer' => __( 'Palmer', 'skyrocket' ),
+				'Antarctica/Rothera' => __( 'Rothera', 'skyrocket' ),
+				'Antarctica/Syowa' => __( 'Syowa', 'skyrocket' ),
+				'Antarctica/Troll' => __( 'Troll', 'skyrocket' ),
+				'Antarctica/Vostok' => __( 'Vostok', 'skyrocket' ),
+				'Atlantic/Azores' => __( 'Azores', 'skyrocket' ),
+				'Atlantic/Bermuda' => __( 'Bermuda', 'skyrocket' ),
+				'Atlantic/Canary' => __( 'Canary', 'skyrocket' ),
+				'Atlantic/Cape_Verde' => __( 'Cape Verde', 'skyrocket' ),
+				'Atlantic/Faroe' => __( 'Faroe', 'skyrocket' ),
+				'Atlantic/Madeira' => __( 'Madeira', 'skyrocket' ),
+				'Atlantic/Reykjavik' => __( 'Reykjavik', 'skyrocket' ),
+				'Atlantic/South_Georgia' => __( 'South Georgia', 'skyrocket' ),
+				'Atlantic/Stanley' => __( 'Stanley', 'skyrocket' ),
+				'Atlantic/St_Helena' => __( 'St Helena', 'skyrocket' ),
+				'Australia/Adelaide' => __( 'Adelaide', 'skyrocket' ),
+				'Australia/Brisbane' => __( 'Brisbane', 'skyrocket' ),
+				'Australia/Broken_Hill' => __( 'Broken Hill', 'skyrocket' ),
+				'Australia/Currie' => __( 'Currie', 'skyrocket' ),
+				'Australia/Darwin' => __( 'Darwin', 'skyrocket' ),
+				'Australia/Eucla' => __( 'Eucla', 'skyrocket' ),
+				'Australia/Hobart' => __( 'Hobart', 'skyrocket' ),
+				'Australia/Lindeman' => __( 'Lindeman', 'skyrocket' ),
+				'Australia/Lord_Howe' => __( 'Lord Howe', 'skyrocket' ),
+				'Australia/Melbourne' => __( 'Melbourne', 'skyrocket' ),
+				'Australia/Perth' => __( 'Perth', 'skyrocket' ),
+				'Australia/Sydney' => __( 'Sydney', 'skyrocket' ),
+			)
+		)
+	) );
+
    /**
     * WP_Customize_Control
 	*		wp_enqueue_script( 'skyrocket-custom-controls-js',  plugin_dir_url( __DIR__ )  . 'public/js/customizer.js', array( 'jquery', 'jquery-ui-core' ), '1.0', true );

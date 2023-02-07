@@ -16,11 +16,12 @@ function api_separator( $wp_customize ) {
 if( class_exists( 'WP_Customize_Control' ) ):
 	class WP_Customize_Latest_Post_Control extends WP_Customize_Control {
 		public $type = 'latest_post_dropdown';
+		public $post_type = 'post';
  
 		public function render_content() {
 
 		$latest = new WP_Query( array(
-			'post_type'   => 'post',
+			'post_type'   => $this->post_type,
 			'post_status' => 'publish',
 			'orderby'     => 'date',
 			'order'       => 'DESC'
@@ -33,7 +34,7 @@ if( class_exists( 'WP_Customize_Control' ) ):
 					<?php 
 					while( $latest->have_posts() ) {
 						$latest->the_post();
-						echo "<option " . selected( $this->value(), get_the_ID() ) . " value='' . get_the_ID() . ''>" . the_title( '', '', false ) . "</option>";
+						echo "<option " . selected( $this->value(), get_the_ID() ) . " value='" . get_the_ID() . "'>" . the_title( '', '', false ) . "</option>";
 					}
 					?>
 				</select>
@@ -46,6 +47,7 @@ endif;
 $wp_customize->add_setting(
   'api_new_list_post',
   array(
+    'default' => '1',
       'sanitize_callback' => 'wp_filter_nohtml_kses',
   )
 );
@@ -56,7 +58,9 @@ $wp_customize->add_control( new WP_Customize_Latest_Post_Control(
 	array(
 		'label'	=> __( '选择一篇特色文章', 'themename' ),
 		'section' => 'separator_section',
-    'post_type' => 'page'
+        //'post_type' => 'page'//页面
+        'post_type' => 'post'//文章
+        
 	) 
 ));
 
@@ -380,7 +384,7 @@ if( class_exists( 'WP_Customize_Control' ) ) {
 
 $wp_customize->add_setting( 'cd_photocount' , array(
     'default'     => 0,
-    //'transport'   => 'postMessage',
+    'transport'   => 'postMessage',
 ) );
 
 $wp_customize->add_control( new WP_Customize_Range( $wp_customize, 'cd_photocount', array(
@@ -393,9 +397,40 @@ $wp_customize->add_control( new WP_Customize_Range( $wp_customize, 'cd_photocoun
 
 
 
+//添加文章选择控件
+ //获取包含文章列表的数组
+ $list_one = get_posts();//文章
 
+ //添加空数组
+ $list_two = [];
 
+ //循环遍历数组并每次添加正确的值
+ foreach ( $list_one as $list_three ) {
+    $list_two[ $list_three->ID ] = esc_html__( $list_three->post_title, 'text-domain' );
+ }
 
+ //Register the setting
+ $wp_customize->add_setting( 'list_content', array(
+     'type'       => 'theme_mod',
+     'capability' => 'edit_theme_options',
+     'default' => '',
+ ) );
+
+ //Register the control
+ $wp_customize->add_control( 'list_content', array(
+     'type' => 'select',
+     'section' => 'separator_section',
+     'label' => __( '选择分类' ),
+     'description' => __( 'Description.' ),
+     'choices' => $list_two, //添加带有选项的列表
+ ) );
+
+ function ppps( $data ) {
+    echo '<pre>';
+    print_r( $data );
+    echo '</pre>';
+}
+//echo ppps($list_one);
 
 
 

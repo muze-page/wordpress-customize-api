@@ -285,52 +285,41 @@ $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'cove
 //            'choices' => $rjs_choices_list_number, //Add the list with options
 //        ) );
 
-        //自定义控件
+        //自定义按钮控件
         //https://developer.wordpress.org/themes/customize-api/customizer-objects/#custom-controls-sections-and-panels
 
         class WP_New_Menu_Customize_Control extends WP_Customize_Control {
             public $type = 'new_menu';
             /**
-            * Render the control's content.
+            * 渲染控件的内容。
    */
    public function render_content() {
    ?>
-     <button class="button button-primary" id="create-new-menu-submit" tabindex="0">111<?php _e( '自定义菜单' ); ?>222</button>
-     <script>
-        wp.customize( 'blogname', function( setting ) {
-    setting.bind( function( value ) {
-        var code = 'long_title';
-        if ( value.length > 20 ) {
-            setting.notifications.add( code, new wp.customize.Notification(
-                code,
-                {
-                    type: 'warning',
-                    message: 'This theme prefers title with max 20 chars.'
-                }
-            ) );
-        } else {
-            setting.notifications.remove( code );
-        }
-    } );
-} );
-        <script>
+   <span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+     <button class="button button-primary" id="create-new-menu-submit"><?php _e( '自定义菜单' ); ?></button>
+  <script>
+    var btn = document.getElementById("create-new-menu-submit");
+
+    btn.onclick = function () {
+      alert("这就是点击事件~");
+    };
+  </script>
+
    <?php
    }
  }
 
- $wp_customize->add_setting(
-   'cover_template_style',
+ $wp_customize->add_setting('cover_template_style',
    array(
        'sanitize_callback' => 'wp_filter_nohtml_kses',
    )
 );
 
- $wp_customize->add_control(
-   new WP_New_Menu_Customize_Control(
+ $wp_customize->add_control(new WP_New_Menu_Customize_Control(
      $wp_customize, // WP_Customize_Manager
      'cover_template_style', // Setting id
-     array( // Args, including any custom ones.
-       'label' => __( 'Accent Color' ),
+     array( // 参数，包括任何自定义参数。
+       'label' => __( '单击有弹窗' ),
        'section' => 'separator_section',
      )
    )
@@ -420,7 +409,7 @@ $wp_customize->add_control( new WP_Customize_Range( $wp_customize, 'cd_photocoun
  $wp_customize->add_control( 'list_content', array(
      'type' => 'select',
      'section' => 'separator_section',
-     'label' => __( '选择分类' ),
+     'label' => __( '选择文章' ),
      'description' => __( 'Description.' ),
      'choices' => $list_two, //添加带有选项的列表
  ) );

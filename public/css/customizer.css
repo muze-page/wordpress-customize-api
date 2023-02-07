@@ -278,7 +278,7 @@ input[type="number"]:focus {
 }
 
 .slider-custom-control input[type=number] {
-	-moz-appearance: textfield;
+	/*-moz-appearance: textfield;*/
 }
 
 .slider-custom-control  .customize-control-title {

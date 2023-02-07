@@ -266,20 +266,20 @@ $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'cove
 
         //单选按钮
         //Register the setting
-        $wp_customize->add_setting( 'rjs_category_dropdown_radio', array(
-            'type'       => 'theme_mod',
-            'capability' => 'edit_theme_options',
-            'default' => 'uncategorized',
-        ) );
-
-        //Register the control
-        $wp_customize->add_control( 'rjs_category_dropdown_radio', array(
-            'type' => 'radio',
-            'section' => 'separator_section',
-            'label' => __( '包含帖子数的分类下拉列表' ),
-            'description' => __( 'Description.' ),
-            'choices' => $rjs_choices_list_number, //Add the list with options
-        ) );
+//        $wp_customize->add_setting( 'rjs_category_dropdown_radio', array(
+//            'type'       => 'theme_mod',
+//            'capability' => 'edit_theme_options',
+//            'default' => 'uncategorized',
+//        ) );
+//
+//        //Register the control
+//        $wp_customize->add_control( 'rjs_category_dropdown_radio', array(
+//            'type' => 'radio',
+//            'section' => 'separator_section',
+//            'label' => __( '包含帖子数的分类下拉列表' ),
+//            'description' => __( 'Description.' ),
+//            'choices' => $rjs_choices_list_number, //Add the list with options
+//        ) );
 
         //自定义控件
         //https://developer.wordpress.org/themes/customize-api/customizer-objects/#custom-controls-sections-and-panels
@@ -292,6 +292,24 @@ $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'cove
    public function render_content() {
    ?>
      <button class="button button-primary" id="create-new-menu-submit" tabindex="0">111<?php _e( '自定义菜单' ); ?>222</button>
+     <script>
+        wp.customize( 'blogname', function( setting ) {
+    setting.bind( function( value ) {
+        var code = 'long_title';
+        if ( value.length > 20 ) {
+            setting.notifications.add( code, new wp.customize.Notification(
+                code,
+                {
+                    type: 'warning',
+                    message: 'This theme prefers title with max 20 chars.'
+                }
+            ) );
+        } else {
+            setting.notifications.remove( code );
+        }
+    } );
+} );
+        <script>
    <?php
    }
  }
@@ -315,6 +333,63 @@ $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'cove
  );
 
 
+//自定义控件，范围滑块
+if( class_exists( 'WP_Customize_Control' ) ) {
+	class WP_Customize_Range extends WP_Customize_Control {
+		public $type = 'range';
+
+        public function __construct( $manager, $id, $args = array() ) {
+            parent::__construct( $manager, $id, $args );
+            $defaults = array(
+                'min' => 0,
+                'max' => 10,
+                'step' => 1
+            );
+            $args = wp_parse_args( $args, $defaults );
+
+            $this->min = $args['min'];
+            $this->max = $args['max'];
+            $this->step = $args['step'];
+        }
+
+		public function render_content() {
+		?>
+		<label>
+			<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+			<input class='range-slider' min="<?php echo $this->min ?>" max="<?php echo $this->max ?>" step="<?php echo $this->step ?>" type='range' <?php $this->link(); ?> value="<?php echo esc_attr( $this->value() ); ?>" oninput="jQuery(this).next('input').val( jQuery(this).val() )">
+            <input onKeyUp="jQuery(this).prev('input').val( jQuery(this).val() )" type='text' value='<?php echo esc_attr( $this->value() ); ?>'>
+
+		</label>
+        
+        <script>
+        ( function( $ ) {
+            wp.customize( 'cd_photocount', function( value ) {
+	value.bind( function( newval ) {
+		$( '#photocount span' ).html( newval );
+	} );
+} );
+
+} )( jQuery );
+            </script>
+		<?php
+		}
+	}
+}
+
+
+
+$wp_customize->add_setting( 'cd_photocount' , array(
+    'default'     => 0,
+    //'transport'   => 'postMessage',
+) );
+
+$wp_customize->add_control( new WP_Customize_Range( $wp_customize, 'cd_photocount', array(
+	'label'	=>  '自定义范围滑动',
+    'min' => 10,
+    'max' => 9999,
+    'step' => 10,//步长
+	'section' => 'separator_section',
+) ) );
 
 
 
@@ -330,5 +405,8 @@ $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'cove
 }
 ;
 add_action( 'customize_register', 'api_separator' );
+
+
+
 
             ?>
